@@ -7,4 +7,5 @@ import (
 
 func init() {
 	weigo.Router("/", &controller.IndexController{})
+	weigo.Router("/user/", &controller.UserController{})
 }
