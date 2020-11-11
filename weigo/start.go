@@ -11,11 +11,10 @@ import (
 启动函数会执行一些初始化操作，如注初始化数据库、缓存、检测、路由注册等
 */
 func Run() {
-	//注册路由
-	serveMux := http.NewServeMux()
+
 	//启动服务
 	fmt.Println("启动 端口为：9099 的服务")
-	err := http.ListenAndServe(":9099", serveMux)
+	err := http.ListenAndServe(":9099", nil)
 	if err != nil {
 		fmt.Println("启动失败！！！")
 	}
