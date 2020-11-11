@@ -1,4 +1,4 @@
-package frame
+package weigo
 
 import (
 	"fmt"
@@ -13,7 +13,6 @@ import (
 func Run() {
 	//注册路由
 	serveMux := http.NewServeMux()
-	serveMux.HandleFunc("/", route)
 	//启动服务
 	fmt.Println("启动 端口为：9099 的服务")
 	err := http.ListenAndServe(":9099", serveMux)
@@ -23,7 +22,8 @@ func Run() {
 }
 
 func route(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "这是首页")
+	io.WriteString(w, "路由进来的")
+	io.WriteString(w, "\n r.RequestURI: "+r.RequestURI)
 	io.WriteString(w, "\n r.URL.String(): "+r.URL.String())
 	io.WriteString(w, "\n r.Method: "+r.Method)
 	io.WriteString(w, "\n r.Host: "+r.Host)
@@ -49,9 +49,6 @@ func route(w http.ResponseWriter, r *http.Request) {
 		}
 	})
 
-	controllerName := ca[0]
-	actionName := ca[1]
-
-	io.WriteString(w, "\n ca[0]: "+controllerName)
-	io.WriteString(w, "\n ca[1]: "+actionName)
+	fmt.Printf("\n%v", ca)
+	fmt.Printf("\n%v", r)
 }
