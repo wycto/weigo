@@ -7,4 +7,5 @@ type Context struct {
 	Request        *http.Request
 	ControllerName string
 	ActionName     string
+	Param          map[string]string
 }
