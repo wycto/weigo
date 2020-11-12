@@ -1,5 +1,5 @@
 # go-frame
-Go框架
+Go框架 - WeiGO【weigo】
 
 |project #项目目录
 
