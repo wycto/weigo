@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"io"
 	"wycto/weigo"
 )
@@ -11,15 +10,19 @@ type UserController struct {
 	modelName string
 }
 
+func (c UserController) Index() {
+	io.WriteString(c.Context.ResponseWriter, "Welcome UserController Index")
+}
+
 func (c *UserController) Login() {
-	fmt.Println("this is user login", c.Context.Request.Method)
-	fmt.Println("name:", c.Context.Request.FormValue("name"))
-	fmt.Println("name:", c.Context.Request.Form.Get("name"))
-	fmt.Println("ControllerName:", c.Context.ControllerName)
-	fmt.Println("ActionName:", c.Context.ActionName)
+	io.WriteString(c.Context.ResponseWriter, "this is user login"+c.Context.Request.Method)
+	io.WriteString(c.Context.ResponseWriter, "name:"+c.Context.Request.FormValue("name"))
+	io.WriteString(c.Context.ResponseWriter, "name:"+c.Context.Request.Form.Get("name"))
+	io.WriteString(c.Context.ResponseWriter, "ControllerName:"+c.Context.ControllerName)
+	io.WriteString(c.Context.ResponseWriter, "ActionName:"+c.Context.ActionName)
 	io.WriteString(c.Context.ResponseWriter, "name:"+c.Context.Request.Form.Get("name"))
 }
 
 func (c *UserController) UserInfo() {
-	fmt.Println("this is userinfo")
+	io.WriteString(c.Context.ResponseWriter, "this is userinfo")
 }

@@ -71,7 +71,7 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 		if method.IsValid() {
 			method.Call(nil)
 		} else {
-			io.WriteString(w, "请求不存在："+r.URL.Path)
+			io.WriteString(w, "404 page not found ："+r.URL.Path)
 		}
 	}
 }

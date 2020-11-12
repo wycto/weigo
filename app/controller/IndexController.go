@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"fmt"
+	"io"
 	"wycto/weigo"
 )
 
@@ -10,5 +10,5 @@ type IndexController struct {
 }
 
 func (c *IndexController) Index() {
-	fmt.Println("Welcome WeiGo；c:" + c.Context.ControllerName + ";a:" + c.Context.ActionName)
+	io.WriteString(c.Context.ResponseWriter, "Welcome WeiGo；c:"+c.Context.ControllerName+";a:"+c.Context.ActionName)
 }
