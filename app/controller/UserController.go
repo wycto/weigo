@@ -25,4 +25,5 @@ func (c *UserController) Login() {
 
 func (c *UserController) UserInfo() {
 	io.WriteString(c.Context.ResponseWriter, "this is userinfo")
+	io.WriteString(c.Context.ResponseWriter, " ; name:"+c.Context.GetParam("name"))
 }
