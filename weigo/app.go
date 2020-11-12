@@ -45,6 +45,19 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 		len := len(urlPathArr)
 		if len > 1 {
 			WeiApp.ActionName = urlPathArr[1]
+			if len > 2 {
+				param := make(map[string]string)
+				for i := 2; i <= len; i = i + 2 {
+					if i+1 < len {
+						param[urlPathArr[i]] = urlPathArr[i+1]
+					} else if i < len {
+						param[urlPathArr[i]] = ""
+					}
+				}
+
+				Context.Param = param
+				Context.getData = param
+			}
 		} else {
 			WeiApp.ActionName = "Index"
 		}
