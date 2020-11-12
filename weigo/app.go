@@ -8,6 +8,7 @@ import (
 )
 
 var WeiApp *App
+var WeiContext *Context
 
 type App struct {
 	Server         *http.Server
@@ -24,12 +25,14 @@ func NewApp() *App {
 	return app
 }
 
-func Router(urlPath string, c interface{}) {
+func Router(urlPath string, c ControllerInterface) {
 	http.HandleFunc(urlPath, AppHandleFunc(c))
 }
 
-func AppHandleFunc(controller interface{}) func(w http.ResponseWriter, r *http.Request) {
+func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		Context := &Context{ResponseWriter: w, Request: r}
+
 		urlPath := r.URL.Path
 		urlPathArr := strings.FieldsFunc(urlPath, func(r rune) bool {
 			if r == '/' {
@@ -56,11 +59,19 @@ func AppHandleFunc(controller interface{}) func(w http.ResponseWriter, r *http.R
 			actionMap[strings.ToLower(n)] = n
 		}
 
-		method := value.MethodByName(actionMap[strings.ToLower(WeiApp.ActionName)])
+		ActionName := actionMap[strings.ToLower(WeiApp.ActionName)]
+		ControllerName := reflectType.Elem().Name()
+
+		Context.ControllerName = ControllerName
+		Context.ActionName = ActionName
+		controller.Init(Context)
+
+		method := value.MethodByName(ActionName)
+
 		if method.IsValid() {
 			method.Call(nil)
 		} else {
-			io.WriteString(w, "请求地址错误"+r.URL.Path)
+			io.WriteString(w, "请求不存在："+r.URL.Path)
 		}
 	}
 }

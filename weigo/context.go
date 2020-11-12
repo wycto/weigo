@@ -3,6 +3,8 @@ package weigo
 import "net/http"
 
 type Context struct {
+	ResponseWriter http.ResponseWriter
 	Request        *http.Request
-	ResponseWriter *Response
+	ControllerName string
+	ActionName     string
 }
