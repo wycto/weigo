@@ -12,7 +12,7 @@ func Run() {
 
 	//启动服务
 	ip := GetIP()
-	fmt.Println("服务已启动，地址：", ip+":9099")
+	fmt.Println("服务已启动，地址：", ip+":9099 OR 127.0.0.1:9099")
 	err := http.ListenAndServe(":9099", nil)
 	if err != nil {
 		fmt.Println("启动失败！！！")
