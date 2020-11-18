@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"wycto/weigo"
 )
 
@@ -12,27 +11,10 @@ type User struct {
 	UserInfo map[string]interface{}
 }
 
-func (receiver *User) Select() {
-	rows, err := weigo.GetDataBase().DB.Query("SELECT * FROM cto_park")
+func (receiver *User) Select() ([]map[string]interface{}, error) {
+	rows, err := weigo.GetDataBase().Table("cto_controller").GetRows()
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
-	//查看所有列名
-	cols, _ := rows.Columns()
-	fmt.Println(cols)
-	dataRow := make(map[string]interface{})
-	for _, col := range cols {
-		dataRow[col] = ""
-	}
-	fmt.Println(dataRow)
-
-	dataRows := make([]interface{}, 10)
-
-	for rows.Next() {
-		rows.Scan(dataRow)
-		fmt.Println(dataRow)
-		fmt.Println(&dataRow)
-		dataRows = append(dataRows, dataRow)
-	}
-	fmt.Println(dataRows)
+	return rows, nil
 }

@@ -42,15 +42,15 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 			}
 		})
 
-		len := len(urlPathArr)
-		if len > 1 {
+		length := len(urlPathArr)
+		if length > 1 {
 			WeiApp.ActionName = urlPathArr[1]
-			if len > 2 {
+			if length > 2 {
 				param := make(map[string]string)
-				for i := 2; i <= len; i = i + 2 {
-					if i+1 < len {
+				for i := 2; i <= length; i = i + 2 {
+					if i+1 < length {
 						param[urlPathArr[i]] = urlPathArr[i+1]
-					} else if i < len {
+					} else if i < length {
 						param[urlPathArr[i]] = ""
 					}
 				}
@@ -74,6 +74,7 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 
 		ActionName := actionMap[strings.ToLower(WeiApp.ActionName)]
 		ControllerName := reflectType.Elem().Name()
+		ControllerName = ControllerName[:len(ControllerName)-10]
 
 		Context.ControllerName = ControllerName
 		Context.ActionName = ActionName

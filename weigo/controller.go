@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"strings"
 )
 
 type Controller struct {
@@ -41,7 +42,7 @@ func (controller *Controller) Assign(Key string, Value interface{}) {
 }
 func (controller *Controller) Display(viewName string) {
 	if viewName == "" {
-		viewName = "app/view/index/" + controller.Context.ActionName + ".html"
+		viewName = "app/view/" + strings.ToLower(controller.Context.ControllerName) + "/" + strings.ToLower(controller.Context.ActionName) + ".html"
 	}
 	t, err := template.ParseFiles(viewName)
 	if err != nil {
