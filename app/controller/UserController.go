@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"html/template"
+	"fmt"
 	"io"
+	"wycto/app/model"
 	"wycto/weigo"
 )
 
@@ -25,20 +26,15 @@ func (c *UserController) Login() {
 }
 
 func (c *UserController) UserInfo() {
-	t, err := template.ParseFiles("app/view/test.html")
+	user := model.User{}
+	rows, err := user.Select()
 	if err != nil {
-		io.WriteString(c.Context.ResponseWriter, err.Error())
+		c.Assign("name", err.Error())
 	} else {
-		t.Execute(c.Context.ResponseWriter, c)
+		c.Assign("name", "唯一")
 	}
 
-	io.WriteString(c.Context.ResponseWriter, "\nMethod:"+c.Context.Request.Method)
-	io.WriteString(c.Context.ResponseWriter, "\nname:"+c.Context.GetParam("name"))
-	io.WriteString(c.Context.ResponseWriter, "\n Request.PostForm.Get(\"name2\"):"+c.Context.Request.PostForm.Get("name2"))
-	io.WriteString(c.Context.ResponseWriter, "\n Request.PostFormValue(\"name3\"):"+c.Context.Request.PostFormValue("name3"))
-	io.WriteString(c.Context.ResponseWriter, "\n Request.Form.Get(\"name4\"):"+c.Context.Request.Form.Get("name4"))
-	io.WriteString(c.Context.ResponseWriter, "\n Request.Form.Encode():"+c.Context.Request.Form.Encode())
-	io.WriteString(c.Context.ResponseWriter, "\n Request.URL.RawQuery:"+c.Context.Request.URL.RawQuery)
-	io.WriteString(c.Context.ResponseWriter, "\n Request.URL.Query().Encode():"+c.Context.Request.URL.Query().Encode())
-
+	fmt.Println("rows:", rows)
+	c.Assign("rows", rows)
+	c.Display("")
 }
