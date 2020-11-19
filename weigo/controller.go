@@ -40,6 +40,7 @@ func (controller *Controller) Update() {
 func (controller *Controller) Assign(Key string, Value interface{}) {
 	controller.data[Key] = Value
 }
+
 func (controller *Controller) Display(viewName string) {
 	if viewName == "" {
 		viewName = "app/view/" + strings.ToLower(controller.Context.ControllerName) + "/" + strings.ToLower(controller.Context.ActionName) + ".html"

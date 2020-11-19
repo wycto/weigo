@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"fmt"
 	"io"
 	"wycto/app/model"
+	"wycto/config"
 	"wycto/weigo"
 )
 
@@ -34,7 +34,9 @@ func (c *UserController) UserInfo() {
 		c.Assign("name", "唯一")
 	}
 
-	fmt.Println("rows:", rows)
+	d := config.Config{}
+	d.Get()
+
 	c.Assign("rows", rows)
 	c.Display("")
 }
