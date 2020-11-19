@@ -12,7 +12,7 @@ type User struct {
 }
 
 func (receiver *User) Select() ([]map[string]interface{}, error) {
-	rows, err := weigo.GetDataBase().Table("cto_controller").GetRows()
+	rows, err := weigo.GetDataBase().Table("cto_controller").SetFields("name,id").GetRows()
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,12 @@
+{
+  "database": {
+    "type": "mysql",
+    "hostname": "127.0.0.1",
+    "port": "3306",
+    "database": "platform",
+    "charset": "utf8mb4",
+    "username": "root",
+    "password": "root",
+    "prefix": "cto_"
+  }
+}

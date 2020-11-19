@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"wycto/config"
 )
 
 type DataBase struct {
@@ -13,12 +14,11 @@ type DataBase struct {
 	Where     string
 }
 
-func init() {
-
-}
-
 func GetDataBase() *DataBase {
-	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/platform?charset=utf8")
+	config := config.Config{}
+	confData := config.Get()
+	dataBaseConfig := confData.DataBase
+	db, err := sql.Open(dataBaseConfig.Type, dataBaseConfig.UserName+":"+dataBaseConfig.Password+"@tcp("+dataBaseConfig.HostName+":"+dataBaseConfig.Port+")/"+dataBaseConfig.Database+"?charset="+dataBaseConfig.Charset)
 	if err != nil {
 		fmt.Println("数据库连接失败：", err.Error())
 	}
@@ -58,11 +58,6 @@ func (database *DataBase) GetRows() ([]map[string]interface{}, error) {
 		return nil, errColumns
 	}
 
-	columnTypes, errColumnTypes := rows.ColumnTypes()
-	if errColumnTypes != nil {
-		return nil, errColumnTypes
-	}
-
 	columnLength := len(columns)
 	scanByte := make([]interface{}, columnLength) //临时存储每行数据
 	values := make([]interface{}, columnLength)   //临时存储每行数据
@@ -79,8 +74,6 @@ func (database *DataBase) GetRows() ([]map[string]interface{}, error) {
 
 		item := make(map[string]interface{})
 		for i, data := range values {
-			fmt.Println("columnTypes_Name", columnTypes[i].Name())
-			fmt.Println("columnTypes_DatabaseTypeName", columnTypes[i].DatabaseTypeName())
 			if data != nil {
 				item[columns[i]] = string(data.([]byte)) //取实际类型
 			} else {
@@ -89,6 +82,5 @@ func (database *DataBase) GetRows() ([]map[string]interface{}, error) {
 		}
 		list = append(list, item)
 	}
-	rows.Close()
 	return list, nil
 }
