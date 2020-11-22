@@ -37,6 +37,5 @@ func (receiver *Config) Get() *Config {
 		fmt.Println("Decoder failed", err.Error())
 		return nil
 	}
-	fmt.Println("receiver: ", receiver)
 	return receiver
 }
