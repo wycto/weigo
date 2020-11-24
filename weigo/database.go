@@ -4,50 +4,59 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"wycto/config"
 )
 
-type DataBase struct {
-	DB        *sql.DB
-	TableName string
-	Fields    string
-	Where     string
+var DataBase = &dataBase{}
+
+type dataBase struct {
+	initStatus bool
+	db         *sql.DB
+	tableName  string
+	fields     string
+	where      string
+	group      string
 }
 
-func GetDataBase() *DataBase {
-	config := config.Config{}
-	confData := config.Get()
-	dataBaseConfig := confData.DataBase
+func init() {
+	if DataBase.initStatus == false {
+		DataBase.getConnect()
+	}
+}
+
+func (database *dataBase) getConnect() {
+	dataBaseConfig := Config.DB
 	db, err := sql.Open(dataBaseConfig.Type, dataBaseConfig.UserName+":"+dataBaseConfig.Password+"@tcp("+dataBaseConfig.HostName+":"+dataBaseConfig.Port+")/"+dataBaseConfig.Database+"?charset="+dataBaseConfig.Charset)
 	if err != nil {
 		fmt.Println("数据库连接失败：", err.Error())
+	} else {
+		fmt.Println("mysql connected")
+		database.initStatus = true
 	}
-	database := &DataBase{}
-	database.DB = db
-	database.Fields = "*"
+
+	database.db = db
+	database.tableName = ""
+	database.fields = "*"
+	database.where = ""
+	database.group = ""
+}
+
+func (database *dataBase) Table(tableName string) *dataBase {
+	database.tableName = tableName
 	return database
 }
 
-func DB() *sql.DB {
-	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/platform?charset=utf8")
-	if err != nil {
-		fmt.Println("数据库连接失败：", err.Error())
-	}
-	return db
-}
-
-func (database *DataBase) Table(tableName string) *DataBase {
-	database.TableName = tableName
+func (database *dataBase) Name(tableName string) *dataBase {
+	database.tableName = tableName
 	return database
 }
 
-func (database *DataBase) SetFields(fields string) *DataBase {
-	database.Fields = fields
+func (database *dataBase) SetFields(fields string) *dataBase {
+	database.fields = fields
 	return database
 }
 
-func (database *DataBase) GetRows() ([]map[string]interface{}, error) {
-	rows, err := database.DB.Query("SELECT " + database.Fields + " FROM " + database.TableName)
+func (database *dataBase) Select() ([]map[string]interface{}, error) {
+	rows, err := database.db.Query("SELECT " + database.fields + " FROM " + database.tableName)
 	if err != nil {
 		return nil, err
 	}

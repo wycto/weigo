@@ -12,10 +12,16 @@ type APIController struct {
 }
 
 func (c *APIController) Index() {
-	rows, err := weigo.GetDataBase().Table("cto_article").GetRows()
+	rows, err := weigo.DataBase.Table("cto_user").Select()
 	if err != nil {
-		fmt.Println()
+		fmt.Println(err.Error())
 	}
 	json, _ := json.Marshal(rows)
 	io.WriteString(c.Context.ResponseWriter, string(json))
+}
+
+func (c *APIController) Test() {
+
+	io.WriteString(c.Context.ResponseWriter, "Database:"+weigo.Config.DB.Database)
+	io.WriteString(c.Context.ResponseWriter, "UserName:"+weigo.Config.DB.UserName)
 }

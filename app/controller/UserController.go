@@ -3,7 +3,6 @@ package controller
 import (
 	"io"
 	"wycto/app/model"
-	"wycto/config"
 	"wycto/weigo"
 )
 
@@ -33,9 +32,6 @@ func (c *UserController) UserInfo() {
 	} else {
 		c.Assign("name", "唯一")
 	}
-
-	d := config.Config{}
-	d.Get()
 
 	c.Assign("rows", rows)
 	c.Display("")
