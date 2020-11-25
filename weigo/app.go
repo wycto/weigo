@@ -1,23 +1,30 @@
 package weigo
 
-import (
-	"net/http"
+//定义全局变量
+var (
+	Config   = &config{}   //配置
+	DataBase = &dataBase{} //数据库
 )
 
-var WeiApp *App
-var WeiContext *Context
-
 type App struct {
-	Server         *http.Server
-	ControllerName string
-	ActionName     string
 }
 
+//初始化方法，初始化其他数据
 func init() {
-	WeiApp = NewApp()
+	configInit()   //加载配置
+	dataBaseInit() //连接数据库
 }
 
-func NewApp() *App {
-	app := &App{Server: &http.Server{}}
-	return app
+//初始化配置
+func configInit() {
+	if Config.initStatus == false {
+		Config.loadConfig() //加载配置
+	}
+}
+
+//初始化数据库
+func dataBaseInit() {
+	if DataBase.initStatus == false {
+		DataBase.getConnect() //连接数据库
+	}
 }

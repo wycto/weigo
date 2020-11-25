@@ -6,8 +6,6 @@ import (
 	"os"
 )
 
-var Config = &config{}
-
 type config struct {
 	initStatus bool
 	DB         dbConfig
@@ -22,12 +20,6 @@ type dbConfig struct {
 	Database string
 	Charset  string
 	Prefix   string
-}
-
-func init() {
-	if Config.initStatus == false {
-		Config.loadConfig()
-	}
 }
 
 func (receiver *config) loadConfig() {
