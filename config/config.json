@@ -3,10 +3,10 @@
     "type": "mysql",
     "hostname": "127.0.0.1",
     "port": "3306",
-    "database": "qiheqihui",
+    "database": "platform",
     "charset": "utf8mb4",
     "username": "root",
-    "password": "123qwe",
+    "password": "root",
     "prefix": "cto_"
   }
 }
