@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"reflect"
 )
 
 type dataBase struct {
@@ -52,12 +53,41 @@ func (database *dataBase) SetFields(fields string) *dataBase {
 	return database
 }
 
-func (database *dataBase) Where(where string) *dataBase {
-	if database.where == "" {
-		database.where = " WHERE " + where
+func (database *dataBase) Where(where interface{}) *dataBase {
+	whereStr := ""
+
+	ValueOf := reflect.ValueOf(where)
+	valueType := ValueOf.Kind().String()
+	if valueType == "map" {
+		MapRange := ValueOf.MapRange()
+		for MapRange.Next() {
+			Key := MapRange.Key().String()
+			Value := MapRange.Value().String()
+
+			if string(Value) == Value {
+				Value = "\"" + Value + "\""
+			}
+
+			if whereStr == "" {
+				whereStr = Key + "=" + Value
+			} else {
+				whereStr += " AND " + Key + "=" + Value
+			}
+		}
+	} else if valueType == "string" {
+		whereStr = ValueOf.String()
 	} else {
-		database.where += " AND (" + where + ")"
+
 	}
+
+	if whereStr != "" {
+		if database.where == "" {
+			database.where = " WHERE " + whereStr
+		} else {
+			database.where += " AND (" + whereStr + ")"
+		}
+	}
+
 	return database
 }
 
@@ -115,13 +145,13 @@ func (database *dataBase) GetAll() ([]map[string]interface{}, error) {
 	}
 
 	columnLength := len(columns)
-	scanByte := make([]interface{}, columnLength) //临时存储每行数据
-	values := make([]interface{}, columnLength)   //临时存储每行数据
-	for index, _ := range scanByte {              //为每一列初始化一个指针
+	scanByte := make([]interface{}, columnLength)
+	values := make([]interface{}, columnLength)
+	for index, _ := range scanByte {
 		scanByte[index] = &values[index]
 	}
 
-	var list []map[string]interface{} //返回的切片
+	var list []map[string]interface{}
 	for rows.Next() {
 		err := rows.Scan(scanByte...)
 		if err != nil {
@@ -131,9 +161,9 @@ func (database *dataBase) GetAll() ([]map[string]interface{}, error) {
 		item := make(map[string]interface{})
 		for i, data := range values {
 			if data != nil {
-				item[columns[i]] = string(data.([]byte)) //取实际类型
+				item[columns[i]] = string(data.([]byte))
 			} else {
-				item[columns[i]] = "" //取实际类型
+				item[columns[i]] = ""
 			}
 		}
 		list = append(list, item)

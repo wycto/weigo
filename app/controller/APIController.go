@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"reflect"
 	"wycto/weigo"
 )
 
@@ -12,7 +13,12 @@ type APIController struct {
 }
 
 func (c *APIController) Index() {
-	rows, err := weigo.DataBase.Name("user").Where("uid<5").GetAll()
+	var ww map[string]string
+	ww = make(map[string]string)
+	ww["uid"] = "2"
+	ww["nickname"] = "超级管理员"
+
+	rows, err := weigo.DataBase.Name("user").Where(ww).GetAll()
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -21,7 +27,34 @@ func (c *APIController) Index() {
 }
 
 func (c *APIController) Test() {
+	var where map[string]string
+	where = make(map[string]string)
+	where["name"] = "weiyi"
+	BBB(where)
 
-	io.WriteString(c.Context.ResponseWriter, "Database:"+weigo.Config.DB.Database)
-	io.WriteString(c.Context.ResponseWriter, "UserName:"+weigo.Config.DB.UserName)
+	var a = 10
+	BBB(a)
+
+	var b = "10"
+	BBB(b)
+
+	var d = 10.25
+	BBB(d)
+
+	var e = "weiyi"
+	BBB(e)
+
+	var f = [5]int{23, 67, 89, 23, 34}
+	BBB(f)
+
+	s := []int{1, 2, 3}
+	BBB(s)
+}
+
+func BBB(Where interface{}) {
+	ValueOf := reflect.ValueOf(Where)
+	fmt.Println(ValueOf.Kind().String())
+	fmt.Println(ValueOf.String())
+	fmt.Println("--------")
+
 }
