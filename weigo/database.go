@@ -6,8 +6,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var DataBase = &dataBase{}
-
 type dataBase struct {
 	initStatus bool
 	db         *sql.DB
@@ -15,12 +13,9 @@ type dataBase struct {
 	fields     string
 	where      string
 	group      string
-}
-
-func init() {
-	if DataBase.initStatus == false {
-		DataBase.getConnect()
-	}
+	having     string
+	order      string
+	limit      string
 }
 
 func (database *dataBase) getConnect() {
@@ -38,6 +33,8 @@ func (database *dataBase) getConnect() {
 	database.fields = "*"
 	database.where = ""
 	database.group = ""
+	database.having = ""
+	database.order = ""
 }
 
 func (database *dataBase) Table(tableName string) *dataBase {
@@ -55,10 +52,60 @@ func (database *dataBase) SetFields(fields string) *dataBase {
 	return database
 }
 
-func (database *dataBase) Select() ([]map[string]interface{}, error) {
-	rows, err := database.db.Query("SELECT " + database.fields + " FROM " + database.tableName)
+func (database *dataBase) Where(where string) *dataBase {
+	if database.where == "" {
+		database.where = " WHERE " + where
+	} else {
+		database.where += " AND (" + where + ")"
+	}
+	return database
+}
+
+func (database *dataBase) GetOne() (map[string]interface{}, error) {
+	rows, err := database.db.Query("SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + " LIMIT 1")
 	if err != nil {
 		return nil, err
+	}
+	defer rows.Close()
+
+	columns, errColumns := rows.Columns()
+	if errColumns != nil {
+		return nil, errColumns
+	}
+
+	columnLength := len(columns)
+	scanByte := make([]interface{}, columnLength) //临时存储每行数据
+	values := make([]interface{}, columnLength)   //临时存储每行数据
+	for index, _ := range scanByte {              //为每一列初始化一个指针
+		scanByte[index] = &values[index]
+	}
+
+	rows.Next()
+	err = rows.Scan(scanByte...)
+	if err != nil {
+		return nil, err
+	}
+
+	row := make(map[string]interface{})
+	for i, data := range values {
+		if data != nil {
+			row[columns[i]] = string(data.([]byte)) //取实际类型
+		} else {
+			row[columns[i]] = "" //取实际类型
+		}
+	}
+
+	return row, nil
+}
+
+func (database *dataBase) GetAll() ([]map[string]interface{}, error) {
+	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + database.limit
+	rows, err := database.db.Query(SQL)
+	if err != nil {
+		fmt.Println("SQL:", SQL)
+		return nil, err
+	} else {
+		fmt.Println("SQL:", SQL)
 	}
 	defer rows.Close()
 

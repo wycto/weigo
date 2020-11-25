@@ -12,7 +12,7 @@ type APIController struct {
 }
 
 func (c *APIController) Index() {
-	rows, err := weigo.DataBase.Table("cto_user").Select()
+	rows, err := weigo.DataBase.Name("user").Where("uid<5").GetAll()
 	if err != nil {
 		fmt.Println(err.Error())
 	}
