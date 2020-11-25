@@ -27,9 +27,9 @@ func (database *dataBase) getConnect() {
 	dataBaseConfig := Config.DB
 	db, err := sql.Open(dataBaseConfig.Type, dataBaseConfig.UserName+":"+dataBaseConfig.Password+"@tcp("+dataBaseConfig.HostName+":"+dataBaseConfig.Port+")/"+dataBaseConfig.Database+"?charset="+dataBaseConfig.Charset)
 	if err != nil {
-		fmt.Println("数据库连接失败：", err.Error())
+		fmt.Println("mysql connect fail", err.Error())
 	} else {
-		fmt.Println("mysql connected")
+		fmt.Println("mysql connect ok")
 		database.initStatus = true
 	}
 
@@ -46,7 +46,7 @@ func (database *dataBase) Table(tableName string) *dataBase {
 }
 
 func (database *dataBase) Name(tableName string) *dataBase {
-	database.tableName = tableName
+	database.tableName = Config.DB.Prefix + tableName
 	return database
 }
 

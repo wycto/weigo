@@ -34,11 +34,11 @@ func (receiver *config) loadConfig() {
 
 	filePtr, err := os.Open(RootPath + "/config/config.json")
 	if err != nil {
-		fmt.Println("Open file "+RootPath+"/config/config.json"+"failed [Err:%s]", err.Error())
+		fmt.Println("Open file "+RootPath+"/config/config.json failed [Err:%s]", err.Error())
 	}
 	defer filePtr.Close()
 
-	// 创建json解码器
+	//创建json解码器
 	decoder := json.NewDecoder(filePtr)
 	err = decoder.Decode(&receiver)
 	if err != nil {
