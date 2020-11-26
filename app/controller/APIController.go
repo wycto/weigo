@@ -27,18 +27,19 @@ func (c *APIController) Index() {
 }
 
 func (c *APIController) Test() {
-	re := RegexpWhereKey("age[NOT IN]")
+	re := RegexpWhereKey("age[NOT IN]b[pp]")
 	fmt.Println(re)
 }
 
 func RegexpWhereKey(Key string) string {
-	reg, err := regexp.Compile("[>]|[<]|[=]|[<>]|[!=]|[LIKE]|[IN]|[^NOT IN$]")
+	reg, err := regexp.Compile(`\[(.+)\]`)
 	if err != nil {
 		fmt.Println("regexp err:", err.Error())
 		return ""
 	}
 
-	result := reg.FindAllStringSubmatch(Key, -1)
+	result := reg.FindAllString(Key, -1)
 	fmt.Println(result)
+	fmt.Println(len(result))
 	return ""
 }
