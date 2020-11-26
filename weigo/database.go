@@ -5,6 +5,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"reflect"
+	"strconv"
 )
 
 type dataBase struct {
@@ -48,21 +49,20 @@ func (database *dataBase) Name(tableName string) *dataBase {
 	return database
 }
 
-func (database *dataBase) SetFields(fields string) *dataBase {
-	database.fields = fields
+func (database *dataBase) SetFields(fieldsStr string) *dataBase {
+	database.fields = fieldsStr
 	return database
 }
 
 func (database *dataBase) Where(where interface{}) *dataBase {
 	whereStr := ""
-
 	ValueOf := reflect.ValueOf(where)
 	valueType := ValueOf.Kind().String()
 	if valueType == "map" {
-
 		MapRange := ValueOf.MapRange()
 		for MapRange.Next() {
 			Key := MapRange.Key().String()
+			field, reg := ParseWhereKeyAndRegexp(Key)
 			Value := MapRange.Value().String()
 
 			if len(Value) >= 9 {
@@ -72,15 +72,13 @@ func (database *dataBase) Where(where interface{}) *dataBase {
 			}
 
 			if whereStr == "" {
-				whereStr = Key + "=" + Value
+				whereStr = field + reg + Value
 			} else {
-				whereStr += " AND " + Key + "=" + Value
+				whereStr += " AND " + field + reg + Value
 			}
 		}
 	} else if valueType == "string" {
 		whereStr = ValueOf.String()
-	} else {
-
 	}
 
 	if whereStr != "" {
@@ -94,8 +92,36 @@ func (database *dataBase) Where(where interface{}) *dataBase {
 	return database
 }
 
+func (database *dataBase) Group(groupStr string) *dataBase {
+	database.group = " GROUP " + groupStr
+	return database
+}
+
+func (database *dataBase) Having(havingStr string) *dataBase {
+	database.having = " HAVING " + havingStr
+	return database
+}
+
+func (database *dataBase) Order(orderStr string) *dataBase {
+	database.order = " ORDER " + orderStr
+	return database
+}
+
+func (database *dataBase) Limit(limitStr string) *dataBase {
+	database.limit = " LIMIT " + limitStr
+	return database
+}
+
+func (database *dataBase) Page(page int, count int) *dataBase {
+	begin := (page - 1) * count
+	database.limit = " LIMIT " + strconv.Itoa(begin) + "," + strconv.Itoa(count)
+	return database
+}
+
 func (database *dataBase) GetOne() (map[string]interface{}, error) {
 	rows, err := database.db.Query("SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + " LIMIT 1")
+	database.resetSelectInfo()
+
 	if err != nil {
 		return nil, err
 	}
@@ -133,6 +159,8 @@ func (database *dataBase) GetOne() (map[string]interface{}, error) {
 
 func (database *dataBase) GetAll() ([]map[string]interface{}, error) {
 	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + database.limit
+	database.resetSelectInfo()
+
 	rows, err := database.db.Query(SQL)
 	if err != nil {
 		fmt.Println("SQL:", SQL)
@@ -172,4 +200,8 @@ func (database *dataBase) GetAll() ([]map[string]interface{}, error) {
 		list = append(list, item)
 	}
 	return list, nil
+}
+
+func (database *dataBase) resetSelectInfo() {
+	database.where = ""
 }

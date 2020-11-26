@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"strings"
 	"wycto/weigo"
 )
 
@@ -15,10 +16,10 @@ type APIController struct {
 func (c *APIController) Index() {
 	var ww map[string]string
 	ww = make(map[string]string)
-	ww["uid"] = "2"
-	ww["nickname"] = "[:string]"
+	ww["uid|<"] = "3"
+	ww["nickname"] = "[:string]管理员"
 
-	rows, err := weigo.DataBase.Name("user").Where(ww).GetAll()
+	rows, err := weigo.DataBase.Name("user").Page(3, 2).GetAll()
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -27,19 +28,29 @@ func (c *APIController) Index() {
 }
 
 func (c *APIController) Test() {
-	re := RegexpWhereKey("age[NOT IN]b[pp]")
-	fmt.Println(re)
+	Key, Reg := RegexpWhereKey("age|")
+	fmt.Println(Key, Reg)
 }
 
-func RegexpWhereKey(Key string) string {
-	reg, err := regexp.Compile(`\[(.+)\]`)
+func RegexpWhereKey(Key string) (string, string) {
+	reg, err := regexp.Compile(`\|(.*)`)
 	if err != nil {
 		fmt.Println("regexp err:", err.Error())
-		return ""
+		return Key, "="
 	}
 
 	result := reg.FindAllString(Key, -1)
-	fmt.Println(result)
-	fmt.Println(len(result))
-	return ""
+	if len(result) == 0 {
+		return Key, "="
+	}
+
+	KeyIndexArr := reg.FindAllStringIndex(Key, -1)
+	position := KeyIndexArr[0][0]
+	field := Key[:position]
+	regexpStr := Key[position+1:]
+	regexpStr = strings.Trim(regexpStr, " ")
+	if regexpStr == "" {
+		regexpStr = "="
+	}
+	return field, regexpStr
 }
