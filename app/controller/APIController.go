@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"reflect"
+	"regexp"
 	"wycto/weigo"
 )
 
@@ -16,7 +16,7 @@ func (c *APIController) Index() {
 	var ww map[string]string
 	ww = make(map[string]string)
 	ww["uid"] = "2"
-	ww["nickname"] = "超级管理员"
+	ww["nickname"] = "[:string]"
 
 	rows, err := weigo.DataBase.Name("user").Where(ww).GetAll()
 	if err != nil {
@@ -27,34 +27,18 @@ func (c *APIController) Index() {
 }
 
 func (c *APIController) Test() {
-	var where map[string]string
-	where = make(map[string]string)
-	where["name"] = "weiyi"
-	BBB(where)
-
-	var a = 10
-	BBB(a)
-
-	var b = "10"
-	BBB(b)
-
-	var d = 10.25
-	BBB(d)
-
-	var e = "weiyi"
-	BBB(e)
-
-	var f = [5]int{23, 67, 89, 23, 34}
-	BBB(f)
-
-	s := []int{1, 2, 3}
-	BBB(s)
+	re := RegexpWhereKey("age[NOT IN]")
+	fmt.Println(re)
 }
 
-func BBB(Where interface{}) {
-	ValueOf := reflect.ValueOf(Where)
-	fmt.Println(ValueOf.Kind().String())
-	fmt.Println(ValueOf.String())
-	fmt.Println("--------")
+func RegexpWhereKey(Key string) string {
+	reg, err := regexp.Compile("[>]|[<]|[=]|[<>]|[!=]|[LIKE]|[IN]|[^NOT IN$]")
+	if err != nil {
+		fmt.Println("regexp err:", err.Error())
+		return ""
+	}
 
+	result := reg.FindAllStringSubmatch(Key, -1)
+	fmt.Println(result)
+	return ""
 }

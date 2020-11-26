@@ -59,13 +59,16 @@ func (database *dataBase) Where(where interface{}) *dataBase {
 	ValueOf := reflect.ValueOf(where)
 	valueType := ValueOf.Kind().String()
 	if valueType == "map" {
+
 		MapRange := ValueOf.MapRange()
 		for MapRange.Next() {
 			Key := MapRange.Key().String()
 			Value := MapRange.Value().String()
 
-			if string(Value) == Value {
-				Value = "\"" + Value + "\""
+			if len(Value) >= 9 {
+				if Value[:9] == "[:string]" {
+					Value = "\"" + Value[9:] + "\""
+				}
 			}
 
 			if whereStr == "" {
