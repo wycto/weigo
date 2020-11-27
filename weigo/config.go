@@ -9,6 +9,8 @@ import (
 type config struct {
 	initStatus bool
 	DB         dbConfig
+	APP        appConfig
+	Console    consoleConfig
 }
 
 type dbConfig struct {
@@ -20,6 +22,13 @@ type dbConfig struct {
 	Database string
 	Charset  string
 	Prefix   string
+}
+
+type appConfig struct {
+}
+
+type consoleConfig struct {
+	InfoSqlLog bool
 }
 
 func (receiver *config) loadConfig() {
