@@ -166,7 +166,9 @@ func (database *dataBase) GetAll() ([]map[string]interface{}, error) {
 		fmt.Println("SQL:", SQL)
 		return nil, err
 	} else {
-		fmt.Println("SQL:", SQL)
+		if Config.Console.InfoSqlLog {
+			fmt.Println("[Info SQL]:", SQL)
+		}
 	}
 	defer rows.Close()
 

@@ -1,12 +1,18 @@
 {
+  "App": {
+    "debug": true
+  },
   "DB": {
-    "type": "mysql",
-    "hostname": "127.0.0.1",
-    "port": "3306",
-    "database": "weigo",
-    "charset": "utf8mb4",
-    "username": "test",
-    "password": "123456",
-    "prefix": "wei_"
+    "Type": "mysql",
+    "Hostname": "127.0.0.1",
+    "Port": "3306",
+    "Database": "weigo",
+    "Charset": "utf8mb4",
+    "Username": "test",
+    "Password": "123456",
+    "Prefix": "wei_"
+  },
+  "Console": {
+    "InfoSqlLog": true
   }
 }
