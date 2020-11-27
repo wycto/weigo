@@ -3,10 +3,10 @@
     "type": "mysql",
     "hostname": "127.0.0.1",
     "port": "3306",
-    "database": "platform",
+    "database": "weigo",
     "charset": "utf8mb4",
-    "username": "root",
-    "password": "root",
-    "prefix": "cto_"
+    "username": "test",
+    "password": "123456",
+    "prefix": "wei_"
   }
 }
