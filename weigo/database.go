@@ -26,7 +26,7 @@ func (database *dataBase) getConnect() {
 	if err != nil {
 		fmt.Println("mysql connect fail", err.Error())
 	} else {
-		fmt.Println("mysql connect ok")
+		fmt.Println("mysql open ok")
 		database.initStatus = true
 	}
 
