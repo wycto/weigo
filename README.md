@@ -1,5 +1,6 @@
 # WeiGo 
-#### _V0.1.0版本（无数据库操作）_
+
+V0.2.0版本
 -----------------
 Go框架 - WeiGo【weigo】
 
@@ -71,5 +72,63 @@ _第一个参数：_
  
  
  ### 模型：
- 待续
+
+
+user模型：
+路径：`app/model/user.go`
+代码规则建议:
+一个模型对应一个数据表，属于一个模块；
+
+一个模型只能有一个结构体，就是此模型的结构体，命名一致
+
+模型里面定义的都是改结构体的方法，无其他函数
+
+模型方法如果要获取数据库数据，采用db获取：
+
+`rows, errorStr := weigo.DataBase.Table("cto_controller").SetFields("name,id").GetAll()`
+
+###数据库操作，支持链式操作
+
+`rows, errorStr := weigo.DataBase.Table("cto_controller").SetFields("name,id").GetAll()`
+
+链式操作之前，先获取数据库连接：
+`weigo.DataBase`
+
+链式操作：先指定操作的数据表，两种方式：
+`weigo.DataBase.Table("wei_user")`
+
+`weigo.DataBase.Name("user")`
+
+Table：手动写全表名称
+
+Name：不加前缀，前缀使用配置里面配置的前缀
+
+SetFields：设置要查询的字段
+
+Where：查询条件；可以传字符串；也可以传map
+
+Where("name=\"weigo\" and status=1")
+
+Where(["name"=>"[:string]weigo","status"=>1]);  //[:string]代表字符串，会加引号
+
+Where(["name[like]"=>"weigo","status"=>1])；//[like]代表模糊查询
+
+Group("age,status")：分组，传字符串
+
+Having：传字符串
+
+Order("uid desc,name asc")：排序，传字符串
+
+Limit(10)：GetAll有效，GetOne无效
+
+Page(2,10)：分页查询，第一个参数页面，第二个参数每页大小
+
+GetOne:获取一条数据
+
+GetAll：获取多条数据
+
+连式操作：Table或者Name指定表，GetOne或者GetAll获取数据，其他的不分顺序
+
+`weigo.DataBase.Table("cto_controller").SetFields("name,id").Where().Group().Order().GetAll()`
+
  
