@@ -6,6 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 type dataBase struct {
@@ -166,8 +167,8 @@ func (database *dataBase) GetAll() ([]map[string]interface{}, error) {
 		fmt.Println("SQL:", SQL)
 		return nil, err
 	} else {
-		if Config.Console.InfoSqlLog {
-			fmt.Println("[Info SQL]:", SQL)
+		if Config.Log.SqlInfo == "console" {
+			fmt.Println("["+time.Now().Format("2006-01-02 15:04:05")+"][Info SQL]:", SQL)
 		}
 	}
 	defer rows.Close()
