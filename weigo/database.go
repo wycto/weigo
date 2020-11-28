@@ -213,11 +213,11 @@ func (database *dataBase) getErrorString(ErrorStr string) string {
 	length := len(ErrorStr)
 	if length > 11 {
 		if ErrorStr[:10] == "Error 1045" {
-			return "数据库连接失败：" + ErrorStr
+			return "数据库连接失败，请检查连接账号密码：" + ErrorStr
 		} else if ErrorStr[:10] == "Error 1049" {
-			return "数据库名称不正确：" + ErrorStr
+			return "数据库不存在：" + ErrorStr
 		} else if ErrorStr[:8] == "dial tcp" {
-			return "数据库未启动：" + ErrorStr
+			return "数据库连接失败，请检查网络：" + ErrorStr
 		}
 
 	}

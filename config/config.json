@@ -9,10 +9,10 @@
     "Type": "mysql",
     "Hostname": "127.0.0.1",
     "Port": "3306",
-    "Database": "weigo9",
+    "Database": "weigo",
     "Charset": "utf8mb4",
     "Username": "root",
-    "Password": "123qwe",
+    "Password": "root",
     "Prefix": "wei_"
   }
 }
