@@ -19,9 +19,9 @@ func (c *APIController) Index() {
 	ww["uid|<"] = "3"
 	ww["nickname"] = "[:string]管理员"
 
-	rows, err := weigo.DataBase.Name("user").Page(1, 2).GetAll()
-	if err != nil {
-		fmt.Println(err.Error())
+	rows, errorStr := weigo.DataBase.Name("user").Page(1, 2).GetAll()
+	if errorStr != "" {
+		fmt.Println(errorStr)
 	}
 	json, _ := json.Marshal(rows)
 	io.WriteString(c.Context.ResponseWriter, string(json))

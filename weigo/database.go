@@ -119,18 +119,18 @@ func (database *dataBase) Page(page int, count int) *dataBase {
 	return database
 }
 
-func (database *dataBase) GetOne() (map[string]interface{}, error) {
+func (database *dataBase) GetOne() (map[string]interface{}, string) {
 	rows, err := database.db.Query("SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + " LIMIT 1")
 	database.resetSelectInfo()
 
 	if err != nil {
-		return nil, err
+		return nil, database.getErrorString(err.Error())
 	}
 	defer rows.Close()
 
 	columns, errColumns := rows.Columns()
 	if errColumns != nil {
-		return nil, errColumns
+		return nil, errColumns.Error()
 	}
 
 	columnLength := len(columns)
@@ -143,7 +143,7 @@ func (database *dataBase) GetOne() (map[string]interface{}, error) {
 	rows.Next()
 	err = rows.Scan(scanByte...)
 	if err != nil {
-		return nil, err
+		return nil, err.Error()
 	}
 
 	row := make(map[string]interface{})
@@ -155,17 +155,17 @@ func (database *dataBase) GetOne() (map[string]interface{}, error) {
 		}
 	}
 
-	return row, nil
+	return row, ""
 }
 
-func (database *dataBase) GetAll() ([]map[string]interface{}, error) {
+func (database *dataBase) GetAll() ([]map[string]interface{}, string) {
 	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + database.limit
 	database.resetSelectInfo()
 
 	rows, err := database.db.Query(SQL)
 	if err != nil {
 		fmt.Println("SQL:", SQL)
-		return nil, err
+		return nil, database.getErrorString(err.Error())
 	} else {
 		if Config.Log.SqlInfo == "console" {
 			fmt.Println("["+time.Now().Format("2006-01-02 15:04:05")+"][Info SQL]:", SQL)
@@ -175,7 +175,7 @@ func (database *dataBase) GetAll() ([]map[string]interface{}, error) {
 
 	columns, errColumns := rows.Columns()
 	if errColumns != nil {
-		return nil, errColumns
+		return nil, errColumns.Error()
 	}
 
 	columnLength := len(columns)
@@ -189,7 +189,7 @@ func (database *dataBase) GetAll() ([]map[string]interface{}, error) {
 	for rows.Next() {
 		err := rows.Scan(scanByte...)
 		if err != nil {
-			return nil, err
+			return nil, err.Error()
 		}
 
 		item := make(map[string]interface{})
@@ -202,9 +202,24 @@ func (database *dataBase) GetAll() ([]map[string]interface{}, error) {
 		}
 		list = append(list, item)
 	}
-	return list, nil
+	return list, ""
 }
 
 func (database *dataBase) resetSelectInfo() {
 	database.where = ""
+}
+
+func (database *dataBase) getErrorString(ErrorStr string) string {
+	length := len(ErrorStr)
+	if length > 11 {
+		if ErrorStr[:10] == "Error 1045" {
+			return "数据库连接失败：" + ErrorStr
+		} else if ErrorStr[:10] == "Error 1049" {
+			return "数据库名称不正确：" + ErrorStr
+		} else if ErrorStr[:8] == "dial tcp" {
+			return "数据库未启动：" + ErrorStr
+		}
+
+	}
+	return ErrorStr
 }

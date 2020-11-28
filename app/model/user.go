@@ -11,10 +11,10 @@ type User struct {
 	UserInfo map[string]interface{}
 }
 
-func (receiver *User) Select() ([]map[string]interface{}, error) {
-	rows, err := weigo.DataBase.Table("cto_controller").SetFields("name,id").GetAll()
-	if err != nil {
-		return nil, err
+func (receiver *User) Select() ([]map[string]interface{}, string) {
+	rows, errorStr := weigo.DataBase.Table("cto_controller").SetFields("name,id").GetAll()
+	if errorStr != "" {
+		return nil, errorStr
 	}
-	return rows, nil
+	return rows, ""
 }
