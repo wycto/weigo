@@ -9,8 +9,8 @@ import (
 type config struct {
 	initStatus bool
 	DB         dbConfig
-	APP        appConfig
-	Console    consoleConfig
+	App        appConfig
+	Log        logConfig
 }
 
 type dbConfig struct {
@@ -27,8 +27,8 @@ type dbConfig struct {
 type appConfig struct {
 }
 
-type consoleConfig struct {
-	InfoSqlLog bool
+type logConfig struct {
+	SqlInfo string
 }
 
 func (receiver *config) loadConfig() {

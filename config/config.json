@@ -1,6 +1,9 @@
 {
   "App": {
-    "debug": true
+    "Debug": true
+  },
+  "Log": {
+    "SqlInfo": "console"
   },
   "DB": {
     "Type": "mysql",
@@ -8,11 +11,8 @@
     "Port": "3306",
     "Database": "weigo",
     "Charset": "utf8mb4",
-    "Username": "test",
-    "Password": "123456",
+    "Username": "root",
+    "Password": "root",
     "Prefix": "wei_"
-  },
-  "Console": {
-    "InfoSqlLog": true
   }
 }
