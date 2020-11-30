@@ -178,4 +178,133 @@ GetAll：获取多条数据
 
 `weigo.DataBase.Table("cto_controller").SetFields("name,id").Where().Group().Order().GetAll()`
 
+
+## 数据库增删查改：
+
+```go
+package controller
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"regexp"
+	"strings"
+	"wycto/weigo"
+)
+
+type APIController struct {
+	weigo.Controller
+}
+
+/**
+查询
+*/
+func (c *APIController) Index() {
+	var ww map[string]interface{}
+	ww = make(map[string]interface{})
+
+	rows, errorStr := weigo.DataBase.Name("user").SetFields("email,`name`,`nickname`").Where(ww).GetAll()
+	if errorStr != "" {
+		fmt.Println(errorStr)
+	}
+	json, _ := json.Marshal(rows)
+	io.WriteString(c.Context.ResponseWriter, string(json))
+}
+
+/**
+删除全部
+*/
+func (c *APIController) DeleteAll() {
+	var ww map[string]interface{}
+	ww = make(map[string]interface{})
+	ww["uid|<"] = 5
+	ww["nickname"] = "唯一"
+
+	rows, errorStr := weigo.DataBase.Name("user").DeleteAll()
+	if errorStr != "" {
+		fmt.Println(errorStr)
+	}
+	json, _ := json.Marshal(rows)
+	io.WriteString(c.Context.ResponseWriter, string(json))
+}
+
+/**
+删除
+*/
+func (c *APIController) Delete() {
+	var ww map[string]interface{}
+	ww = make(map[string]interface{})
+	ww["nickname"] = "update后的唯一"
+
+	rows, errorStr := weigo.DataBase.Name("user").Where(ww).Delete()
+	if errorStr != "" {
+		fmt.Println(errorStr)
+	}
+	json, _ := json.Marshal(rows)
+	io.WriteString(c.Context.ResponseWriter, string(json))
+}
+
+/**
+更新
+*/
+func (c *APIController) Update() {
+	var ww map[string]interface{}
+	ww = make(map[string]interface{})
+	ww["nickname"] = "唯一"
+
+	var dd map[string]interface{}
+	dd = make(map[string]interface{})
+	dd["nickname"] = "update后的唯一"
+
+	rows, errorStr := weigo.DataBase.Name("user").Where(ww).Update(dd)
+	if errorStr != "" {
+		fmt.Println(errorStr)
+	}
+	json, _ := json.Marshal(rows)
+	io.WriteString(c.Context.ResponseWriter, string(json))
+}
+
+/**
+新增
+*/
+func (c *APIController) Add() {
+	var ww map[string]interface{}
+	ww = make(map[string]interface{})
+	ww["uid"] = 3
+
+	var dd map[string]interface{}
+	dd = make(map[string]interface{})
+	dd["nickname"] = "唯一"
+
+	rows, errorStr := weigo.DataBase.Name("user").Insert(dd)
+	if errorStr != "" {
+		fmt.Println(errorStr)
+	}
+	json, _ := json.Marshal(rows)
+	io.WriteString(c.Context.ResponseWriter, string(json))
+}
+
+/**
+更新全部
+*/
+func (c *APIController) UpdateAll() {
+	var ww map[string]interface{}
+	ww = make(map[string]interface{})
+	ww["uid"] = 3
+
+	var dd map[string]interface{}
+	dd = make(map[string]interface{})
+	dd["nickname"] = "唯一333"
+
+	rows, errorStr := weigo.DataBase.Name("user").Where(ww).UpdateAll(dd)
+	if errorStr != "" {
+		fmt.Println(errorStr)
+	}
+	json, _ := json.Marshal(rows)
+	io.WriteString(c.Context.ResponseWriter, string(json))
+}
+
+```
+
  

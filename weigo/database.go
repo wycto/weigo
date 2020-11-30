@@ -121,8 +121,12 @@ func (database *dataBase) Page(page int, count int) *dataBase {
 }
 
 func (database *dataBase) GetOne() (map[string]interface{}, string) {
-	rows, err := database.db.Query("SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + " LIMIT 1")
-	database.resetSelectInfo()
+	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + " LIMIT 1"
+	rows, err := database.db.Query(SQL)
+	if Config.Log.SqlInfo == "console" {
+		fmt.Println(Log.FormatLogString(SQL, "Info", "SQL"))
+	}
+	database.resetSQL()
 
 	if err != nil {
 		return nil, database.getErrorString(err.Error())
@@ -161,7 +165,7 @@ func (database *dataBase) GetOne() (map[string]interface{}, string) {
 
 func (database *dataBase) GetAll() ([]map[string]interface{}, string) {
 	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + database.limit
-	database.resetSelectInfo()
+	database.resetSQL()
 
 	rows, err := database.db.Query(SQL)
 	if err != nil {
@@ -206,7 +210,95 @@ func (database *dataBase) GetAll() ([]map[string]interface{}, string) {
 	return list, ""
 }
 
-func (database *dataBase) resetSelectInfo() {
+func (database *dataBase) Insert(data map[string]interface{}) (int64, string) {
+	insertData := database.getInsertValue(data)
+	if insertData == "" {
+		return 0, ""
+	}
+
+	SQL := "INSERT INTO " + database.tableName + insertData
+	database.resetSQL()
+	result, err := database.db.Exec(SQL)
+	if err != nil {
+		return 0, err.Error()
+	}
+
+	num, err := result.RowsAffected()
+	if err != nil {
+		return 0, err.Error()
+	}
+	return num, ""
+}
+
+func (database *dataBase) UpdateAll(data map[string]interface{}) (int64, string) {
+	SQL := "UPDATE " + database.tableName + " SET " + database.getUpdateValue(data)
+	database.resetSQL()
+	result, err := database.db.Exec(SQL)
+	if err != nil {
+		return 0, err.Error()
+	}
+
+	num, err := result.RowsAffected()
+	if err != nil {
+		return 0, err.Error()
+	}
+	return num, ""
+}
+
+func (database *dataBase) Update(data map[string]interface{}) (int64, string) {
+	if database.where != "" {
+		SQL := "UPDATE " + database.tableName + " SET " + database.getUpdateValue(data) + database.where
+		database.resetSQL()
+		result, err := database.db.Exec(SQL)
+		if err != nil {
+			return 0, err.Error()
+		}
+
+		num, err := result.RowsAffected()
+		if err != nil {
+			return 0, err.Error()
+		}
+		return num, ""
+	}
+
+	return 0, "where empty"
+}
+
+func (database *dataBase) DeleteAll() (int64, string) {
+	SQL := "DELETE FROM " + database.tableName
+	database.resetSQL()
+	result, err := database.db.Exec(SQL)
+	if err != nil {
+		return 0, err.Error()
+	}
+
+	num, err := result.RowsAffected()
+	if err != nil {
+		return 0, err.Error()
+	}
+	return num, ""
+}
+
+func (database *dataBase) Delete() (int64, string) {
+	if database.where != "" {
+		SQL := "DELETE FROM " + database.tableName + database.where
+		database.resetSQL()
+		result, err := database.db.Exec(SQL)
+		if err != nil {
+			return 0, err.Error()
+		}
+
+		num, err := result.RowsAffected()
+		if err != nil {
+			return 0, err.Error()
+		}
+		return num, ""
+	}
+
+	return 0, "where empty"
+}
+
+func (database *dataBase) resetSQL() {
 	database.where = ""
 }
 
@@ -252,9 +344,7 @@ func (database *dataBase) getReflectValue(InterfaceValue interface{}) string {
 	Value := "\"\""
 	ValueInterfaceValueOf := reflect.ValueOf(InterfaceValue)
 	valueType := ValueInterfaceValueOf.Kind()
-	fmt.Println("Type:", valueType)
-	fmt.Println("Value:", ValueInterfaceValueOf)
-	fmt.Println("ValueString:", ValueInterfaceValueOf.String())
+
 	switch valueType {
 	case reflect.String:
 		Value = "\"" + strings.Trim(ValueInterfaceValueOf.String(), " ") + "\""
@@ -273,4 +363,34 @@ func (database *dataBase) getReflectValue(InterfaceValue interface{}) string {
 	}
 
 	return Value
+}
+
+func (database *dataBase) getUpdateValue(updateData map[string]interface{}) string {
+	updateValueStr := ""
+
+	for field, data := range updateData {
+		value := database.getReflectValue(data)
+		updateValueStr += "`" + field + "`=" + value
+	}
+	return updateValueStr
+}
+
+func (database *dataBase) getInsertValue(updateData map[string]interface{}) string {
+	fields := ""
+	values := ""
+
+	for field, data := range updateData {
+		value := database.getReflectValue(data)
+		fields += ",`" + field + "`"
+		values += "," + value
+	}
+
+	if fields == "" {
+		return ""
+	}
+
+	fields = fields[1:]
+	values = values[1:]
+
+	return "(" + fields + ") VALUES (" + values + ")"
 }
