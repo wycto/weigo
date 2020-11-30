@@ -14,12 +14,12 @@ type APIController struct {
 }
 
 func (c *APIController) Index() {
-	var ww map[string]string
-	ww = make(map[string]string)
-	ww["uid|<"] = "3"
-	ww["nickname"] = "[:string]管理员"
+	var ww map[string]interface{}
+	ww = make(map[string]interface{})
+	ww["uid|<"] = 5
+	ww["nickname"] = c
 
-	rows, errorStr := weigo.DataBase.Name("user").Page(1, 2).GetAll()
+	rows, errorStr := weigo.DataBase.Name("user").SetFields("email,`name`,`nickname`").Where(ww).GetAll()
 	if errorStr != "" {
 		fmt.Println(errorStr)
 	}
