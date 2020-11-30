@@ -4,6 +4,7 @@ package weigo
 var (
 	Config   = &config{}   //配置
 	DataBase = &dataBase{} //数据库
+	Log      = &log{}
 )
 
 type App struct {

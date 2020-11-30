@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"regexp"
-	"strings"
 )
 
 /**
@@ -32,27 +30,4 @@ func GetIP() string {
 	}
 
 	return ip
-}
-
-func ParseWhereKeyAndRegexp(fieldReg string) (string, string) {
-	reg, err := regexp.Compile(`\|(.*)`)
-	if err != nil {
-		fmt.Println("regexp err:", err.Error())
-		return fieldReg, "="
-	}
-
-	result := reg.FindAllString(fieldReg, -1)
-	if len(result) == 0 {
-		return fieldReg, "="
-	}
-
-	fieldRegIndexArr := reg.FindAllStringIndex(fieldReg, -1)
-	position := fieldRegIndexArr[0][0]
-	field := fieldReg[:position]
-	regexpStr := fieldReg[position+1:]
-	regexpStr = strings.Trim(regexpStr, " ")
-	if regexpStr == "" {
-		regexpStr = "="
-	}
-	return field, regexpStr
 }

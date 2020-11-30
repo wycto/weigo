@@ -5,8 +5,9 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"reflect"
+	"regexp"
 	"strconv"
-	"time"
+	"strings"
 )
 
 type dataBase struct {
@@ -41,16 +42,19 @@ func (database *dataBase) getConnect() {
 }
 
 func (database *dataBase) Table(tableName string) *dataBase {
-	database.tableName = tableName
+	database.tableName = "`" + tableName + "`"
 	return database
 }
 
 func (database *dataBase) Name(tableName string) *dataBase {
-	database.tableName = Config.DB.Prefix + tableName
+	database.tableName = "`" + Config.DB.Prefix + tableName + "`"
 	return database
 }
 
 func (database *dataBase) SetFields(fieldsStr string) *dataBase {
+	fieldsStr = strings.Replace(fieldsStr, "`", "", -1)
+	fieldsStr = strings.Replace(fieldsStr, ",", "`,`", -1)
+	fieldsStr = "`" + fieldsStr + "`"
 	database.fields = fieldsStr
 	return database
 }
@@ -62,15 +66,12 @@ func (database *dataBase) Where(where interface{}) *dataBase {
 	if valueType == "map" {
 		MapRange := ValueOf.MapRange()
 		for MapRange.Next() {
-			Key := MapRange.Key().String()
-			field, reg := ParseWhereKeyAndRegexp(Key)
-			Value := MapRange.Value().String()
 
-			if len(Value) >= 9 {
-				if Value[:9] == "[:string]" {
-					Value = "\"" + Value[9:] + "\""
-				}
-			}
+			field, reg := database.getReflectKey(MapRange.Key().String())
+			field = strings.Replace(field, "`", "", -1)
+			field = "`" + field + "`"
+
+			Value := database.getReflectValue(MapRange.Value().Interface())
 
 			if whereStr == "" {
 				whereStr = field + reg + Value
@@ -168,7 +169,7 @@ func (database *dataBase) GetAll() ([]map[string]interface{}, string) {
 		return nil, database.getErrorString(err.Error())
 	} else {
 		if Config.Log.SqlInfo == "console" {
-			fmt.Println("["+time.Now().Format("2006-01-02 15:04:05")+"][Info SQL]:", SQL)
+			fmt.Println(Log.FormatLogString(SQL, "Info", "SQL"))
 		}
 	}
 	defer rows.Close()
@@ -222,4 +223,54 @@ func (database *dataBase) getErrorString(ErrorStr string) string {
 
 	}
 	return ErrorStr
+}
+
+func (database *dataBase) getReflectKey(fieldReg string) (string, string) {
+	reg, err := regexp.Compile(`\|(.*)`)
+	if err != nil {
+		fmt.Println("regexp err:", err.Error())
+		return fieldReg, "="
+	}
+
+	result := reg.FindAllString(fieldReg, -1)
+	if len(result) == 0 {
+		return fieldReg, "="
+	}
+
+	fieldRegIndexArr := reg.FindAllStringIndex(fieldReg, -1)
+	position := fieldRegIndexArr[0][0]
+	field := fieldReg[:position]
+	regexpStr := fieldReg[position+1:]
+	regexpStr = strings.Trim(regexpStr, " ")
+	if regexpStr == "" {
+		regexpStr = "="
+	}
+	return field, regexpStr
+}
+
+func (database *dataBase) getReflectValue(InterfaceValue interface{}) string {
+	Value := "\"\""
+	ValueInterfaceValueOf := reflect.ValueOf(InterfaceValue)
+	valueType := ValueInterfaceValueOf.Kind()
+	fmt.Println("Type:", valueType)
+	fmt.Println("Value:", ValueInterfaceValueOf)
+	fmt.Println("ValueString:", ValueInterfaceValueOf.String())
+	switch valueType {
+	case reflect.String:
+		Value = "\"" + strings.Trim(ValueInterfaceValueOf.String(), " ") + "\""
+	case reflect.Float64:
+		Value = strconv.FormatFloat(ValueInterfaceValueOf.Float(), 'E', -1, 64)
+	case reflect.Float32:
+		Value = strconv.FormatFloat(ValueInterfaceValueOf.Float(), 'E', -1, 32)
+	case reflect.Int:
+		Value = strconv.Itoa(int(ValueInterfaceValueOf.Int()))
+	case reflect.Int64:
+		Value = strconv.FormatInt(ValueInterfaceValueOf.Int(), 10)
+	case reflect.Bool:
+		Value = strconv.FormatBool(ValueInterfaceValueOf.Bool())
+	default:
+		fmt.Println(Log.FormatLogString("SELECT WHERE Parse Error; Value:"+ValueInterfaceValueOf.String(), "Error", "SQL"))
+	}
+
+	return Value
 }
