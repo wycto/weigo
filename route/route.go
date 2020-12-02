@@ -9,4 +9,5 @@ func init() {
 	weigo.Router("/", &controller.IndexController{})
 	weigo.Router("/user/", &controller.UserController{})
 	weigo.Router("/api/", &controller.APIController{})
+	weigo.Router("/test/", &controller.TestController{})
 }

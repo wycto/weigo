@@ -17,11 +17,7 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 
 		urlPath := r.URL.Path
 		urlPathArr := strings.FieldsFunc(urlPath, func(r rune) bool {
-			if r == '/' {
-				return true
-			} else {
-				return false
-			}
+			return r == '/'
 		})
 
 		length := len(urlPathArr)
