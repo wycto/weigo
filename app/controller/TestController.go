@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"fmt"
+	fmt "fmt"
 	"wycto/weigo"
 )
 
@@ -26,4 +26,11 @@ func sum(s []int, c chan int) {
 		sum += v
 	}
 	c <- sum // 把 sum 发送到通道 c
+}
+
+func (receiver *TestController) Route() {
+	fmt.Println("param", receiver.Context.ParamData())
+	fmt.Println("Get", receiver.Context.GetData())
+	fmt.Println("Post", receiver.Context.PostData())
+	fmt.Println("---------")
 }
