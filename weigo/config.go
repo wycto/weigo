@@ -51,9 +51,9 @@ func (receiver *config) loadConfig() {
 	decoder := json.NewDecoder(filePtr)
 	err = decoder.Decode(&receiver)
 	if err != nil {
-		fmt.Println("config init failed", err.Error())
+		fmt.Println("配置加载失败", err.Error())
 	} else {
 		receiver.initStatus = true
-		fmt.Println("config init ok")
+		fmt.Println("配置加载完成")
 	}
 }

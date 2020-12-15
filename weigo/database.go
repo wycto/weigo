@@ -30,9 +30,9 @@ func (database *dataBase) getConnect() {
 	dataBaseConfig := Config.DB
 	db, err := sql.Open(dataBaseConfig.Type, dataBaseConfig.UserName+":"+dataBaseConfig.Password+"@tcp("+dataBaseConfig.HostName+":"+dataBaseConfig.Port+")/"+dataBaseConfig.Database+"?charset="+dataBaseConfig.Charset)
 	if err != nil {
-		fmt.Println("mysql connect fail", err.Error())
+		fmt.Println("数据库连接失败", err.Error())
 	} else {
-		fmt.Println("mysql open ok")
+		fmt.Println("数据库打开成功")
 		database.initStatus = true
 	}
 
