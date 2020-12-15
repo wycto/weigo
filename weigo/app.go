@@ -8,7 +8,8 @@ import "os"
 
 //定义全局变量-常量
 var (
-	RootPath, _ = os.Getwd()
+	RootPath, _ = os.Getwd()              //跟目录
+	ViewPath    = RootPath + "/app/view/" //页面模版目录
 )
 
 //定义全局变量-系统类
