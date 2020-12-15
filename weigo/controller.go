@@ -55,7 +55,7 @@ func (controller *Controller) Assign(Key string, Value interface{}) {
 //页面模版渲染
 func (controller *Controller) Display(viewName string) {
 	if viewName == "" {
-		viewName = "app/view/" + strings.ToLower(controller.Context.ControllerName) + "/" + strings.ToLower(controller.Context.ActionName) + ".html"
+		viewName = ViewPath + strings.ToLower(controller.Context.ControllerName) + "/" + strings.ToLower(controller.Context.ActionName) + ".html"
 	}
 	t, err := template.ParseFiles(viewName)
 	if err != nil {
