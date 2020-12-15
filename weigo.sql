@@ -57,8 +57,8 @@ CREATE TABLE `wei_user` (
 -- Records of wei_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `wei_user` VALUES (1, 'admin', '123456', 'weiyi', '唯一', '294287600@qq.com', '294287600', '294287600', 1);
-INSERT INTO `wei_user` VALUES (2, 'weigo', '123654', 'weigo', 'weigo', '5665156156@qq.com', '41561561', '1651651', 1);
+INSERT INTO `wei_user` VALUES (1, 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'weiyi', '唯一', '294287600@qq.com', '294287600', '294287600', 1);
+INSERT INTO `wei_user` VALUES (2, 'weigo', 'e10adc3949ba59abbe56e057f20f883e', 'weigo', 'weigo', '5665156156@qq.com', '41561561', '1651651', 1);
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
