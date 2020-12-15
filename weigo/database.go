@@ -1,5 +1,8 @@
 package weigo
 
+/*
+数据库类
+*/
 import (
 	"database/sql"
 	"fmt"
@@ -11,17 +14,18 @@ import (
 )
 
 type dataBase struct {
-	initStatus bool
-	db         *sql.DB
-	tableName  string
-	fields     string
-	where      string
-	group      string
-	having     string
-	order      string
-	limit      string
+	initStatus bool    //是否初始化类
+	db         *sql.DB //db
+	tableName  string  //操作的表名称，全名称
+	fields     string  //查询的字段
+	where      string  //条件，包括查询、更新、删除
+	group      string  //分组
+	having     string  //
+	order      string  //排序
+	limit      string  //限制条数
 }
 
+//连接数据库
 func (database *dataBase) getConnect() {
 	dataBaseConfig := Config.DB
 	db, err := sql.Open(dataBaseConfig.Type, dataBaseConfig.UserName+":"+dataBaseConfig.Password+"@tcp("+dataBaseConfig.HostName+":"+dataBaseConfig.Port+")/"+dataBaseConfig.Database+"?charset="+dataBaseConfig.Charset)
@@ -41,16 +45,19 @@ func (database *dataBase) getConnect() {
 	database.order = ""
 }
 
+//级联操作-设置操作的表名称，全表名称，包含前缀
 func (database *dataBase) Table(tableName string) *dataBase {
 	database.tableName = "`" + tableName + "`"
 	return database
 }
 
+//级联操作-设置操作的表名称，不带前缀，使用配置里面的前缀
 func (database *dataBase) Name(tableName string) *dataBase {
 	database.tableName = "`" + Config.DB.Prefix + tableName + "`"
 	return database
 }
 
+//级联操作-设置要查询的字段
 func (database *dataBase) SetFields(fieldsStr string) *dataBase {
 	fieldsStr = strings.Replace(fieldsStr, "`", "", -1)
 	fieldsStr = strings.Replace(fieldsStr, ",", "`,`", -1)
@@ -59,6 +66,7 @@ func (database *dataBase) SetFields(fieldsStr string) *dataBase {
 	return database
 }
 
+//级联操作-操作的条件，包含查询、修改、删除
 func (database *dataBase) Where(where interface{}) *dataBase {
 	whereStr := ""
 	ValueOf := reflect.ValueOf(where)
@@ -94,32 +102,38 @@ func (database *dataBase) Where(where interface{}) *dataBase {
 	return database
 }
 
+//级联操作-分组
 func (database *dataBase) Group(groupStr string) *dataBase {
 	database.group = " GROUP " + groupStr
 	return database
 }
 
+//级联操作-聚合判断
 func (database *dataBase) Having(havingStr string) *dataBase {
 	database.having = " HAVING " + havingStr
 	return database
 }
 
+//级联操作-排序
 func (database *dataBase) Order(orderStr string) *dataBase {
 	database.order = " ORDER " + orderStr
 	return database
 }
 
+//级联操作-限制条数
 func (database *dataBase) Limit(limitStr string) *dataBase {
 	database.limit = " LIMIT " + limitStr
 	return database
 }
 
+//级联操作-分页设置
 func (database *dataBase) Page(page int, count int) *dataBase {
 	begin := (page - 1) * count
 	database.limit = " LIMIT " + strconv.Itoa(begin) + "," + strconv.Itoa(count)
 	return database
 }
 
+//查询一条数据
 func (database *dataBase) GetOne() (map[string]interface{}, string) {
 	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + " LIMIT 1"
 	rows, err := database.db.Query(SQL)
@@ -163,6 +177,7 @@ func (database *dataBase) GetOne() (map[string]interface{}, string) {
 	return row, ""
 }
 
+//查询多条数据
 func (database *dataBase) GetAll() ([]map[string]interface{}, string) {
 	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + database.limit
 	database.resetSQL()
@@ -210,6 +225,7 @@ func (database *dataBase) GetAll() ([]map[string]interface{}, string) {
 	return list, ""
 }
 
+//插入一条数据
 func (database *dataBase) Insert(data map[string]interface{}) (int64, string) {
 	insertData := database.getInsertValue(data)
 	if insertData == "" {
@@ -230,6 +246,7 @@ func (database *dataBase) Insert(data map[string]interface{}) (int64, string) {
 	return num, ""
 }
 
+//更新所有-不使用条件
 func (database *dataBase) UpdateAll(data map[string]interface{}) (int64, string) {
 	SQL := "UPDATE " + database.tableName + " SET " + database.getUpdateValue(data)
 	database.resetSQL()
@@ -245,6 +262,7 @@ func (database *dataBase) UpdateAll(data map[string]interface{}) (int64, string)
 	return num, ""
 }
 
+//根据条件更新
 func (database *dataBase) Update(data map[string]interface{}) (int64, string) {
 	if database.where != "" {
 		SQL := "UPDATE " + database.tableName + " SET " + database.getUpdateValue(data) + database.where
@@ -264,6 +282,7 @@ func (database *dataBase) Update(data map[string]interface{}) (int64, string) {
 	return 0, "where empty"
 }
 
+//删除所有-不使用条件
 func (database *dataBase) DeleteAll() (int64, string) {
 	SQL := "DELETE FROM " + database.tableName
 	database.resetSQL()
@@ -279,6 +298,7 @@ func (database *dataBase) DeleteAll() (int64, string) {
 	return num, ""
 }
 
+//根据条件删除
 func (database *dataBase) Delete() (int64, string) {
 	if database.where != "" {
 		SQL := "DELETE FROM " + database.tableName + database.where

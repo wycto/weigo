@@ -1,19 +1,31 @@
 package weigo
 
-//定义全局变量
+import "os"
+
+/*
+系统应用程序全局向光，定义常量、全局变量等
+*/
+
+//定义全局变量-常量
+var (
+	RootPath, _ = os.Getwd()
+)
+
+//定义全局变量-系统类
 var (
 	Config   = &config{}   //配置
 	DataBase = &dataBase{} //数据库
-	Log      = &log{}
+	Log      = &log{}      //日志
 )
 
+//APP类
 type App struct {
 }
 
-//初始化方法，初始化其他数据
+//初始化方法
 func init() {
-	configInit()   //加载配置
-	dataBaseInit() //连接数据库
+	configInit()   //初始化配置
+	dataBaseInit() //初始化数据库
 }
 
 //初始化配置

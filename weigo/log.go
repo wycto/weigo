@@ -1,5 +1,8 @@
 package weigo
 
+/*
+日志类，日志的处理
+*/
 import "time"
 
 type log struct {
