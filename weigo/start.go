@@ -1,5 +1,8 @@
 package weigo
 
+/*
+系统启用入口
+*/
 import (
 	"fmt"
 	"net/http"

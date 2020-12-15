@@ -1,5 +1,8 @@
 package weigo
 
+/*
+函数都写在这儿
+*/
 import (
 	"fmt"
 	"net"

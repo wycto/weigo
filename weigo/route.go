@@ -1,5 +1,8 @@
 package weigo
 
+/*
+路由类，解析路由和请求参数
+*/
 import (
 	"encoding/json"
 	"io"
