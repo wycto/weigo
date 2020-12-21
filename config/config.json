@@ -1,9 +1,7 @@
 {
   "App": {
-    "Debug": true
-  },
-  "Log": {
-    "SqlInfo": "console"
+    "Debug": true,
+    "Port": "9099"
   },
   "DB": {
     "Type": "mysql",
@@ -14,5 +12,11 @@
     "Username": "root",
     "Password": "123qwe",
     "Prefix": "wei_"
+  },
+  "Log": {
+    "SqlInfo": "console"
+  },
+  "View": {
+    "RootPath": "/app/view"
   }
 }

@@ -15,6 +15,7 @@ type config struct {
 	DB         dbConfig  //数据库配置
 	App        appConfig //系统应用配置
 	Log        logConfig //日志配置
+	View       viewConfig
 }
 
 //数据库配置
@@ -31,11 +32,17 @@ type dbConfig struct {
 
 //系统应用配置
 type appConfig struct {
+	Port string
 }
 
 //日志配置
 type logConfig struct {
 	SqlInfo string
+}
+
+//日志配置
+type viewConfig struct {
+	RootPath string
 }
 
 //加载配置
