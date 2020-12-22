@@ -17,7 +17,7 @@ func (c *APIController) Index() {
 	var ww map[string]interface{}
 	ww = make(map[string]interface{})
 
-	rows, errorStr := weigo.DataBase.Name("user").SetFields("email,`name`,`nickname`").Where(ww).GetAll()
+	rows, errorStr := weigo.DataBase.Name("user").SetFields("email,`name`,`nickname`").Where(ww).Select()
 	if errorStr != "" {
 		fmt.Println(errorStr)
 	}

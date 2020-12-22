@@ -134,7 +134,7 @@ func (database *dataBase) Page(page int, count int) *dataBase {
 }
 
 //查询一条数据
-func (database *dataBase) GetOne() (map[string]interface{}, string) {
+func (database *dataBase) Find() (map[string]interface{}, string) {
 	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + " LIMIT 1"
 	rows, err := database.db.Query(SQL)
 	if Config.Log.SqlInfo == "console" {
@@ -178,7 +178,7 @@ func (database *dataBase) GetOne() (map[string]interface{}, string) {
 }
 
 //查询多条数据
-func (database *dataBase) GetAll() ([]map[string]interface{}, string) {
+func (database *dataBase) Select() ([]map[string]interface{}, string) {
 	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + database.limit
 	database.resetSQL()
 

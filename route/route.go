@@ -10,4 +10,5 @@ func init() {
 	weigo.Router("/user/", &controller.UserController{})
 	weigo.Router("/api/", &controller.APIController{})
 	weigo.Router("/test/", &controller.TestController{})
+	weigo.Router("/model/", &controller.ModelController{})
 }

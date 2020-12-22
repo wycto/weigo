@@ -4,17 +4,16 @@ import (
 	"wycto/weigo"
 )
 
-type User struct {
-	Name     string
-	Age      int
-	Like     []string
-	UserInfo map[string]interface{}
+func UserModel() *User {
+	user := &User{}
+	user.SetTableName("user")
+	return user
 }
 
-func (receiver *User) Select() ([]map[string]interface{}, string) {
-	rows, errorStr := weigo.DataBase.Table("cto_controller").SetFields("name,id").GetAll()
-	if errorStr != "" {
-		return nil, errorStr
-	}
-	return rows, ""
+type User struct {
+	weigo.Model
+}
+
+func (receiver *User) Test() string {
+	return "其他方法"
 }
