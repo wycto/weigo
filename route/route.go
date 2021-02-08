@@ -1,14 +1,14 @@
 package route
 
 import (
-	"wycto/app/controller"
+	"wycto/app/index/controller"
 	"wycto/weigo"
 )
 
 func init() {
 	weigo.Router("/", &controller.IndexController{})
-	weigo.Router("/user/", &controller.UserController{})
-	weigo.Router("/api/", &controller.APIController{})
-	weigo.Router("/test/", &controller.TestController{})
-	weigo.Router("/model/", &controller.ModelController{})
+	weigo.Router("/index/user/", &controller.UserController{})
+	weigo.Router("/index/api/", &controller.APIController{})
+	weigo.Router("/index/test/", &controller.TestController{})
+	weigo.Router("/index/model/", &controller.ModelController{})
 }

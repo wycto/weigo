@@ -32,7 +32,11 @@ type dbConfig struct {
 
 //系统应用配置
 type appConfig struct {
-	Port string
+	ServerPort            string
+	Debug                 bool
+	DefaultAppName        string
+	DefaultControllerName string
+	DefaultActionName     string
 }
 
 //日志配置

@@ -2,7 +2,7 @@ package controller
 
 import (
 	"fmt"
-	"wycto/app/model"
+	"wycto/app/index/model"
 	"wycto/weigo"
 )
 

@@ -18,11 +18,18 @@ func Router(urlPath string, c ControllerInterface) {
 }
 
 func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r *http.Request) {
+
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		Context := &Context{ResponseWriter: w, Request: r}
 		Context.Header = r.Header
 
 		urlPath := r.URL.Path
+
+		if urlPath == "/favicon.ico" {
+			return
+		}
+
 		urlPathArr := strings.FieldsFunc(urlPath, func(r rune) bool {
 			return r == '/'
 		})
@@ -30,8 +37,11 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 		get := make(map[string]string)
 
 		length := len(urlPathArr)
-		if length > 1 {
-			Context.ActionName = urlPathArr[1]
+		if length >= 3 {
+			Context.AppName = urlPathArr[0]
+			Context.ControllerName = urlPathArr[1]
+			Context.ActionName = urlPathArr[2]
+
 			if length > 2 {
 				//get参数处理
 				for i := 2; i <= length; i = i + 2 {
@@ -53,8 +63,18 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 
 				Context.getData = get
 			}
+		} else if length == 2 {
+			Context.AppName = urlPathArr[0]
+			Context.ControllerName = urlPathArr[1]
+			Context.ActionName = Config.App.DefaultActionName
+		} else if length == 1 {
+			Context.AppName = urlPathArr[0]
+			Context.ControllerName = Config.App.DefaultControllerName
+			Context.ActionName = Config.App.DefaultActionName
 		} else {
-			Context.ActionName = "Index"
+			Context.AppName = Config.App.DefaultAppName
+			Context.ControllerName = Config.App.DefaultControllerName
+			Context.ActionName = Config.App.DefaultActionName
 		}
 
 		//post参数处理

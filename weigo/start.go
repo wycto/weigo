@@ -16,8 +16,8 @@ func Run() {
 
 	//启动服务
 	ip := GetIP()
-	fmt.Println("服务已启动，地址：", ip+":"+Config.App.Port+" OR 127.0.0.1:"+Config.App.Port)
-	err := http.ListenAndServe(":"+Config.App.Port, nil)
+	fmt.Println("服务已启动，地址：", ip+":"+Config.App.ServerPort+" OR 127.0.0.1:"+Config.App.ServerPort)
+	err := http.ListenAndServe(":"+Config.App.ServerPort, nil)
 	fmt.Println(err)
 	if err != nil {
 		fmt.Println("启动失败！！！")
