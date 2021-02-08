@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -56,7 +57,8 @@ func (controller *Controller) Assign(Key string, Value interface{}) {
 //页面模版渲染
 func (controller *Controller) Display(viewName string) {
 	if viewName == "" {
-		viewName = RootPath + Config.View.RootPath + "/" + strings.ToLower(controller.Context.ControllerName) + "/" + strings.ToLower(controller.Context.ActionName) + ".html"
+		DS := string(os.PathSeparator)
+		viewName = RootPath + DS + "app" + DS + strings.ToLower(controller.Context.AppName) + DS + "view" + DS + strings.ToLower(controller.Context.ControllerName) + DS + strings.ToLower(controller.Context.ActionName) + ".html"
 	}
 	t, err := template.ParseFiles(viewName)
 	if err != nil {

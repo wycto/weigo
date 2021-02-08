@@ -2,7 +2,7 @@ package controller
 
 import (
 	"io"
-	"wycto/app/model"
+	"wycto/app/index/model"
 	"wycto/weigo"
 )
 
@@ -25,7 +25,7 @@ func (c *UserController) Login() {
 }
 
 func (c *UserController) UserInfo() {
-	user := model.User{}
+	user := model.IndexModelUser{}
 	rows, err := user.Select()
 	if err != "" {
 		c.Assign("name", err)

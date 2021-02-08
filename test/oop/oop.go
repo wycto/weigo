@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"wycto/app/model"
+	"wycto/app/index/model"
 )
 
 func main() {

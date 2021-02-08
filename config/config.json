@@ -1,7 +1,10 @@
 {
   "App": {
     "Debug": true,
-    "Port": "9099"
+    "ServerPort": "9099",
+    "DefaultAppName":"index",
+    "DefaultControllerName":"index",
+    "DefaultActionName":"index"
   },
   "DB": {
     "Type": "mysql",

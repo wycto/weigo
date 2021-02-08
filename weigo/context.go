@@ -8,6 +8,7 @@ import "net/http"
 type Context struct {
 	ResponseWriter http.ResponseWriter
 	Request        *http.Request
+	AppName        string              //当前应用名称
 	ControllerName string              //当前控制器名称
 	ActionName     string              //当前动作方法名称
 	paramData      map[string]string   //请求参数，合并类get、post
