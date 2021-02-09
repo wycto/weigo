@@ -8,7 +8,8 @@ import "os"
 
 //定义全局变量-常量
 var (
-	RootPath, _ = os.Getwd() //根目录
+	RootPath, _ = os.Getwd()               //根目录
+	DS          = string(os.PathSeparator) //目录分隔符
 )
 
 //定义全局变量-系统类
