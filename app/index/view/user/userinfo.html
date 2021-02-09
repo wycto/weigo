@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WeiGo框架</title>
+    <style>
+        .center{text-align: center;margin: 100px auto}
+    </style>
+</head>
+<body>
+<div class="center">
+    <h1>Welcome WeiGo</h1>
+    <p>欢迎来到 WeiGo 框架</p>
+    <p>WeiGo 框架采用MVC模式，简单易用，原生构架，没有使用第三方库</p>
+    <p>{{.name}}</p>
+    {{ range .rows }}
+        <p>{{ .id }}__{{ .name }}__{{ .code }}__{{ .status }}__{{ .memo }}</p>
+    {{ end }}
+</div>
+</body>
+</html>
