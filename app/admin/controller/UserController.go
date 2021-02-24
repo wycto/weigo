@@ -25,7 +25,7 @@ func (c *UserController) Login() {
 }
 
 func (c *UserController) UserInfo() {
-	user := model.User{}
+	user := model.UserModel()
 	rows, err := user.Select()
 	if err != "" {
 		c.Assign("name", err)
