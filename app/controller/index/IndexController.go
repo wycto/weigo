@@ -1,4 +1,4 @@
-package controller
+package index
 
 import (
 	"wycto/weigo"

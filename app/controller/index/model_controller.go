@@ -1,8 +1,8 @@
-package controller
+package index
 
 import (
 	"fmt"
-	"wycto/app/index/model"
+	"wycto/app/model"
 	"wycto/weigo"
 )
 
