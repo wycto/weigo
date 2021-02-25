@@ -3,7 +3,10 @@ package weigo
 /*
 此类为上下文，请求上下文
 */
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
+)
 
 type Context struct {
 	ResponseWriter http.ResponseWriter
@@ -15,6 +18,58 @@ type Context struct {
 	getData        map[string]string   //get参数
 	postData       map[string]string   //post参数
 	Header         map[string][]string //header信息
+}
+
+//是post请求
+func (context *Context) IsGet() bool {
+	if context.Request.Method == "GET" {
+		return true
+	}
+	return false
+}
+
+//是post请求
+func (context *Context) IsPost() bool {
+	if context.Request.Method == "POST" {
+		return true
+	}
+	return false
+}
+
+//响应json数据
+func (context *Context) ResponseJson(data interface{}) {
+	json, err := json.Marshal(data)
+	if err != nil {
+		context.ResponseWriter.Write([]byte(""))
+	} else {
+		context.ResponseWriter.Write(json)
+	}
+}
+
+//输出错误json
+func (context *Context) Error(msg string, data interface{}) {
+	context.Response(1, msg, data)
+}
+
+//输出成功json
+func (context *Context) Success(msg string, data interface{}) {
+	context.Response(0, msg, data)
+}
+
+//输出code、msg json
+func (context *Context) Response(code int, msg string, data interface{}) {
+
+	dataMap := make(map[string]interface{})
+	dataMap["code"] = code
+	dataMap["msg"] = msg
+	dataMap["data"] = data
+
+	json, err := json.Marshal(dataMap)
+	if err != nil {
+		context.ResponseWriter.Write([]byte(""))
+	} else {
+		context.ResponseWriter.Write(json)
+	}
 }
 
 //获取get参数

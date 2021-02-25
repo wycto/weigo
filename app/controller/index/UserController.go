@@ -1,8 +1,8 @@
-package controller
+package index
 
 import (
 	"io"
-	"wycto/app/index/model"
+	"wycto/app/model"
 	"wycto/weigo"
 )
 
@@ -12,7 +12,7 @@ type UserController struct {
 }
 
 func (c UserController) Index() {
-	io.WriteString(c.Context.ResponseWriter, "Welcome UserController Index")
+	io.WriteString(c.Context.ResponseWriter, "{aa:12}")
 }
 
 func (c *UserController) Login() {

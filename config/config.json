@@ -13,13 +13,10 @@
     "Database": "weigo",
     "Charset": "utf8mb4",
     "Username": "root",
-    "Password": "123qwe",
-    "Prefix": "wei_"
+    "Password": "root",
+    "Prefix": ""
   },
   "Log": {
     "SqlInfo": "console"
-  },
-  "View": {
-    "RootPath": "/app/view"
   }
 }

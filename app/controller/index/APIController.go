@@ -1,4 +1,4 @@
-package controller
+package index
 
 import (
 	"encoding/json"
@@ -22,7 +22,8 @@ func (c *APIController) Index() {
 		fmt.Println(errorStr)
 	}
 	json, _ := json.Marshal(rows)
-	io.WriteString(c.Context.ResponseWriter, string(json))
+	//io.WriteString(c.Context.ResponseWriter, string(json))
+	c.Context.ResponseWriter.Write(json)
 }
 
 func (c *APIController) DeleteAll() {
