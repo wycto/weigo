@@ -5,12 +5,14 @@ package weigo
 */
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
+	"wycto/weigo/datatype"
 )
 
 type dataBase struct {
@@ -134,7 +136,10 @@ func (database *dataBase) Page(page int, count int) *dataBase {
 }
 
 //查询一条数据
-func (database *dataBase) Find() (map[string]interface{}, string) {
+func (database *dataBase) Find() (row *datatype.Row, err error) {
+
+	row = &datatype.Row{}
+
 	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + " LIMIT 1"
 	rows, err := database.db.Query(SQL)
 	if Config.Log.SqlInfo == "console" {
@@ -143,13 +148,13 @@ func (database *dataBase) Find() (map[string]interface{}, string) {
 	database.resetSQL()
 
 	if err != nil {
-		return nil, database.getErrorString(err.Error())
+		return row, errors.New(database.getErrorString(err.Error()))
 	}
 	defer rows.Close()
 
 	columns, errColumns := rows.Columns()
 	if errColumns != nil {
-		return nil, errColumns.Error()
+		return row, errColumns
 	}
 
 	columnLength := len(columns)
@@ -162,40 +167,41 @@ func (database *dataBase) Find() (map[string]interface{}, string) {
 	rows.Next()
 	err = rows.Scan(scanByte...)
 	if err != nil {
-		return nil, err.Error()
+		return row, err
 	}
 
-	row := make(map[string]interface{})
 	for i, data := range values {
 		if data != nil {
-			row[columns[i]] = string(data.([]byte)) //取实际类型
+			(*row)[columns[i]] = string(data.([]byte)) //取实际类型
 		} else {
-			row[columns[i]] = "" //取实际类型
+			(*row)[columns[i]] = "" //取实际类型
 		}
 	}
 
-	return row, ""
+	return row, err
 }
 
 //查询多条数据
-func (database *dataBase) Select() ([]map[string]interface{}, string) {
+func (database *dataBase) Select() (rows *datatype.Rows, err error) {
+	rows = &datatype.Rows{}
+
 	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + database.limit
 	database.resetSQL()
 
-	rows, err := database.db.Query(SQL)
+	dbRows, err := database.db.Query(SQL)
 	if err != nil {
 		fmt.Println("SQL:", SQL)
-		return nil, database.getErrorString(err.Error())
+		return rows, errors.New(database.getErrorString(err.Error()))
 	} else {
 		if Config.Log.SqlInfo == "console" {
 			fmt.Println(Log.FormatLogString(SQL, "Info", "SQL"))
 		}
 	}
-	defer rows.Close()
+	defer dbRows.Close()
 
-	columns, errColumns := rows.Columns()
+	columns, errColumns := dbRows.Columns()
 	if errColumns != nil {
-		return nil, errColumns.Error()
+		return rows, errColumns
 	}
 
 	columnLength := len(columns)
@@ -205,24 +211,24 @@ func (database *dataBase) Select() ([]map[string]interface{}, string) {
 		scanByte[index] = &values[index]
 	}
 
-	var list []map[string]interface{}
-	for rows.Next() {
-		err := rows.Scan(scanByte...)
+	for dbRows.Next() {
+		err = dbRows.Scan(scanByte...)
 		if err != nil {
-			return nil, err.Error()
+			return rows, err
 		}
 
-		item := make(map[string]interface{})
+		item := &datatype.Row{}
 		for i, data := range values {
 			if data != nil {
-				item[columns[i]] = string(data.([]byte))
+				(*item)[columns[i]] = string(data.([]byte))
 			} else {
-				item[columns[i]] = ""
+				(*item)[columns[i]] = ""
 			}
 		}
-		list = append(list, item)
+		tmpRows := append(*rows, item)
+		rows = &tmpRows
 	}
-	return list, ""
+	return rows, nil
 }
 
 //插入一条数据

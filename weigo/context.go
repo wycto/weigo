@@ -36,6 +36,11 @@ func (context *Context) IsPost() bool {
 	return false
 }
 
+//响应字符串
+func (context *Context) ResponseString(str string) {
+	context.ResponseWriter.Write([]byte(str))
+}
+
 //响应json数据
 func (context *Context) ResponseJson(data interface{}) {
 	json, err := json.Marshal(data)
@@ -46,30 +51,30 @@ func (context *Context) ResponseJson(data interface{}) {
 	}
 }
 
-//输出错误json
-func (context *Context) Error(msg string, data interface{}) {
-	context.Response(1, msg, data)
-}
-
-//输出成功json
-func (context *Context) Success(msg string, data interface{}) {
-	context.Response(0, msg, data)
-}
-
-//输出code、msg json
-func (context *Context) Response(code int, msg string, data interface{}) {
+//响应code、msg json
+func (context *Context) ResponseApiJson(code int, msg string, data interface{}) {
 
 	dataMap := make(map[string]interface{})
 	dataMap["code"] = code
 	dataMap["msg"] = msg
 	dataMap["data"] = data
 
-	json, err := json.Marshal(dataMap)
-	if err != nil {
-		context.ResponseWriter.Write([]byte(""))
-	} else {
-		context.ResponseWriter.Write(json)
-	}
+	context.ResponseJson(dataMap)
+}
+
+//输出错误json
+func (context *Context) ResponseError(msg string, data interface{}) {
+	context.ResponseApiJson(1, msg, data)
+}
+
+//输出成功json
+func (context *Context) ResponseSuccess(msg string, data interface{}) {
+	context.ResponseApiJson(0, msg, data)
+}
+
+//响应系统级信息
+func (context *Context) ResponseMessage(message *Message, data interface{}) {
+	context.ResponseApiJson(message.Code, message.Msg, data)
 }
 
 //获取get参数

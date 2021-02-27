@@ -1,19 +1,21 @@
 package weigo
 
+import "wycto/weigo/datatype"
+
 /*MVC的M层，模型类*/
 type Model struct {
 	tableName string
 }
 
-func (receiver *Model) SetTableName(Name string) *Model {
-	receiver.tableName = Name
-	return receiver
+func (model *Model) SetTableName(Name string) *Model {
+	model.tableName = Name
+	return model
 }
 
-func (receiver *Model) Find() (map[string]interface{}, string) {
-	return DataBase.Name(receiver.tableName).Find()
+func (model *Model) Find() (row *datatype.Row, err error) {
+	return DB.Name(model.tableName).Find()
 }
 
-func (receiver *Model) Select() ([]map[string]interface{}, string) {
-	return DataBase.Name(receiver.tableName).Select()
+func (model *Model) Select() (rows *datatype.Rows, err error) {
+	return DB.Name(model.tableName).Select()
 }
