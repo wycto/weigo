@@ -25,9 +25,9 @@ func (c *UserController) Login() {
 }
 
 func (c *UserController) UserInfo() {
-	user := model.IndexModelUser{}
+	user := model.User{}
 	rows, err := user.Select()
-	if err != "" {
+	if err != nil {
 		c.Assign("name", err)
 	} else {
 		c.Assign("name", "唯一")

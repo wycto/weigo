@@ -17,9 +17,9 @@ func (c *APIController) Index() {
 	var ww map[string]interface{}
 	ww = make(map[string]interface{})
 
-	rows, errorStr := weigo.DataBase.Name("user").SetFields("email,`name`,`nickname`").Where(ww).Select()
-	if errorStr != "" {
-		fmt.Println(errorStr)
+	rows, err := weigo.DB.Name("user").SetFields("email,`name`,`nickname`").Where(ww).Select()
+	if err != nil {
+		fmt.Println(err)
 	}
 	json, _ := json.Marshal(rows)
 	//io.WriteString(c.Context.ResponseWriter, string(json))
@@ -32,7 +32,7 @@ func (c *APIController) DeleteAll() {
 	ww["uid|<"] = 5
 	ww["nickname"] = "唯一"
 
-	rows, errorStr := weigo.DataBase.Name("user").DeleteAll()
+	rows, errorStr := weigo.DB.Name("user").DeleteAll()
 	if errorStr != "" {
 		fmt.Println(errorStr)
 	}
@@ -45,7 +45,7 @@ func (c *APIController) Delete() {
 	ww = make(map[string]interface{})
 	ww["nickname"] = "update后的唯一"
 
-	rows, errorStr := weigo.DataBase.Name("user").Where(ww).Delete()
+	rows, errorStr := weigo.DB.Name("user").Where(ww).Delete()
 	if errorStr != "" {
 		fmt.Println(errorStr)
 	}
@@ -62,7 +62,7 @@ func (c *APIController) Update() {
 	dd = make(map[string]interface{})
 	dd["nickname"] = "update后的唯一"
 
-	rows, errorStr := weigo.DataBase.Name("user").Where(ww).Update(dd)
+	rows, errorStr := weigo.DB.Name("user").Where(ww).Update(dd)
 	if errorStr != "" {
 		fmt.Println(errorStr)
 	}
@@ -79,7 +79,7 @@ func (c *APIController) Add() {
 	dd = make(map[string]interface{})
 	dd["nickname"] = "唯一"
 
-	rows, errorStr := weigo.DataBase.Name("user").Insert(dd)
+	rows, errorStr := weigo.DB.Name("user").Insert(dd)
 	if errorStr != "" {
 		fmt.Println(errorStr)
 	}
@@ -96,7 +96,7 @@ func (c *APIController) UpdateAll() {
 	dd = make(map[string]interface{})
 	dd["nickname"] = "唯一333"
 
-	rows, errorStr := weigo.DataBase.Name("user").Where(ww).UpdateAll(dd)
+	rows, errorStr := weigo.DB.Name("user").Where(ww).UpdateAll(dd)
 	if errorStr != "" {
 		fmt.Println(errorStr)
 	}

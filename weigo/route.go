@@ -21,7 +21,7 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		Context := &Context{ResponseWriter: w, Request: r}
+		var Context = &Context{ResponseWriter: w, Request: r}
 		Context.Header = r.Header
 
 		urlPath := r.URL.Path

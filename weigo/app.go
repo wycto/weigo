@@ -14,9 +14,9 @@ var (
 
 //定义全局变量-系统类
 var (
-	Config   = &config{}   //配置
-	DataBase = &dataBase{} //数据库
-	Log      = &log{}      //日志
+	Config = &config{}   //配置
+	DB     = &dataBase{} //数据库
+	Log    = &log{}      //日志
 )
 
 //APP类
@@ -38,7 +38,7 @@ func configInit() {
 
 //初始化数据库
 func dataBaseInit() {
-	if DataBase.initStatus == false {
-		DataBase.getConnect() //连接数据库
+	if DB.initStatus == false {
+		DB.getConnect() //连接数据库
 	}
 }

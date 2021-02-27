@@ -25,27 +25,27 @@ func (controller *Controller) Init(context *Context) {
 
 //控制器默认的请求方法
 func (controller *Controller) Index() {
-	http.Error(controller.Context.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
+	http.NotFound(controller.Context.ResponseWriter, controller.Context.Request)
 }
 
 //列表方法
 func (controller *Controller) List() {
-	http.Error(controller.Context.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
+	http.NotFound(controller.Context.ResponseWriter, controller.Context.Request)
 }
 
 //详情方法
 func (controller *Controller) View() {
-	http.Error(controller.Context.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
+	http.NotFound(controller.Context.ResponseWriter, controller.Context.Request)
 }
 
 //删除方法
 func (controller *Controller) Delete() {
-	http.Error(controller.Context.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
+	http.NotFound(controller.Context.ResponseWriter, controller.Context.Request)
 }
 
 //修改方法
 func (controller *Controller) Update() {
-	http.Error(controller.Context.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
+	http.NotFound(controller.Context.ResponseWriter, controller.Context.Request)
 }
 
 //页面模版赋值
@@ -64,4 +64,28 @@ func (controller *Controller) Display(viewName string) {
 	} else {
 		t.Execute(controller.Context.ResponseWriter, controller.data)
 	}
+}
+
+//输出成功的json格式
+func (controller *Controller) ResponseSuccess(msg string, data interface{}) {
+	controller.Context.ResponseSuccess(msg, data)
+}
+
+//输出失败的json格式
+func (controller *Controller) ResponseError(msg string, data interface{}) {
+	controller.Context.ResponseError(msg, data)
+}
+
+//输出系统定义好的错误代码格式json数据
+func (controller *Controller) ResponseErrorMessage(message *Message, data interface{}) {
+	controller.Context.ResponseMessage(message, data)
+}
+
+//输出字符串
+func (controller *Controller) ResponseString(msg string) {
+	controller.Context.ResponseString(msg)
+}
+
+func (controller *Controller) MethodNotAllowed() {
+	http.Error(controller.Context.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
 }

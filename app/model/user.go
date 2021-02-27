@@ -4,16 +4,16 @@ import (
 	"wycto/weigo"
 )
 
-func UserModel() *IndexModelUser {
-	user := &IndexModelUser{}
+func UserModel() *User {
+	user := &User{}
 	user.SetTableName("user")
 	return user
 }
 
-type IndexModelUser struct {
+type User struct {
 	weigo.Model
 }
 
-func (receiver *IndexModelUser) Test() string {
+func (receiver *User) Test() string {
 	return "其他方法"
 }
