@@ -60,7 +60,7 @@ func (database *dataBase) Name(tableName string) *dataBase {
 }
 
 //级联操作-设置要查询的字段
-func (database *dataBase) SetFields(fieldsStr string) *dataBase {
+func (database *dataBase) Fields(fieldsStr string) *dataBase {
 	fieldsStr = strings.Replace(fieldsStr, "`", "", -1)
 	fieldsStr = strings.Replace(fieldsStr, ",", "`,`", -1)
 	fieldsStr = "`" + fieldsStr + "`"
@@ -69,28 +69,15 @@ func (database *dataBase) SetFields(fieldsStr string) *dataBase {
 }
 
 //级联操作-操作的条件，包含查询、修改、删除
-func (database *dataBase) Where(where interface{}) *dataBase {
+func (database *dataBase) Where(where *datatype.Row) *dataBase {
 	whereStr := ""
-	ValueOf := reflect.ValueOf(where)
-	valueType := ValueOf.Kind().String()
-	if valueType == "map" {
-		MapRange := ValueOf.MapRange()
-		for MapRange.Next() {
 
-			field, reg := database.getReflectKey(MapRange.Key().String())
-			field = strings.Replace(field, "`", "", -1)
-			field = "`" + field + "`"
-
-			Value := database.getReflectValue(MapRange.Value().Interface())
-
-			if whereStr == "" {
-				whereStr = field + reg + Value
-			} else {
-				whereStr += " AND " + field + reg + Value
-			}
+	for key, val := range *where {
+		if whereStr == "" {
+			whereStr = key + "='" + fmt.Sprintf("%v", val) + "'"
+		} else {
+			whereStr += " AND " + key + "='" + fmt.Sprintf("%v", val) + "'"
 		}
-	} else if valueType == "string" {
-		whereStr = ValueOf.String()
 	}
 
 	if whereStr != "" {
@@ -232,24 +219,24 @@ func (database *dataBase) Select() (rows *datatype.Rows, err error) {
 }
 
 //插入一条数据
-func (database *dataBase) Insert(data map[string]interface{}) (int64, string) {
+func (database *dataBase) Insert(data *datatype.Row) (id string, err error) {
 	insertData := database.getInsertValue(data)
 	if insertData == "" {
-		return 0, ""
+		return id, errors.New("没有要插入的数据")
 	}
 
 	SQL := "INSERT INTO " + database.tableName + insertData
 	database.resetSQL()
 	result, err := database.db.Exec(SQL)
 	if err != nil {
-		return 0, err.Error()
+		return id, err
 	}
 
 	num, err := result.RowsAffected()
 	if err != nil {
-		return 0, err.Error()
+		return strconv.Itoa(int(num)), err
 	}
-	return num, ""
+	return id, err
 }
 
 //更新所有-不使用条件
@@ -401,11 +388,11 @@ func (database *dataBase) getUpdateValue(updateData map[string]interface{}) stri
 	return updateValueStr
 }
 
-func (database *dataBase) getInsertValue(updateData map[string]interface{}) string {
+func (database *dataBase) getInsertValue(updateData *datatype.Row) string {
 	fields := ""
 	values := ""
 
-	for field, data := range updateData {
+	for field, data := range *updateData {
 		value := database.getReflectValue(data)
 		fields += ",`" + field + "`"
 		values += "," + value
