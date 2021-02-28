@@ -21,8 +21,8 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		var Context = &Context{ResponseWriter: w, Request: r}
-		Context.Header = r.Header
+		var context = &Context{ResponseWriter: w, Request: r}
+		context.Header = r.Header
 
 		urlPath := r.URL.Path
 
@@ -38,9 +38,9 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 
 		length := len(urlPathArr)
 		if length >= 3 {
-			Context.AppName = urlPathArr[0]
-			Context.ControllerName = urlPathArr[1]
-			Context.ActionName = urlPathArr[2]
+			context.AppName = urlPathArr[0]
+			context.ControllerName = urlPathArr[1]
+			context.ActionName = urlPathArr[2]
 
 			if length > 2 {
 				//get参数处理
@@ -61,20 +61,20 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 					}
 				}
 
-				Context.getData = get
+				context.getData = get
 			}
 		} else if length == 2 {
-			Context.AppName = urlPathArr[0]
-			Context.ControllerName = urlPathArr[1]
-			Context.ActionName = Config.App.DefaultActionName
+			context.AppName = urlPathArr[0]
+			context.ControllerName = urlPathArr[1]
+			context.ActionName = Config.App.DefaultActionName
 		} else if length == 1 {
-			Context.AppName = urlPathArr[0]
-			Context.ControllerName = Config.App.DefaultControllerName
-			Context.ActionName = Config.App.DefaultActionName
+			context.AppName = urlPathArr[0]
+			context.ControllerName = Config.App.DefaultControllerName
+			context.ActionName = Config.App.DefaultActionName
 		} else {
-			Context.AppName = Config.App.DefaultAppName
-			Context.ControllerName = Config.App.DefaultControllerName
-			Context.ActionName = Config.App.DefaultActionName
+			context.AppName = Config.App.DefaultAppName
+			context.ControllerName = Config.App.DefaultControllerName
+			context.ActionName = Config.App.DefaultActionName
 		}
 
 		//post参数处理
@@ -109,17 +109,17 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 			post[k] = val
 		}
 
-		Context.postData = post
+		context.postData = post
 
 		//合并参数，post覆盖get
 		param := make(map[string]string)
-		for k, val := range Context.getData {
+		for k, val := range context.getData {
 			param[k] = val
 		}
-		for k, val := range Context.postData {
+		for k, val := range context.postData {
 			param[k] = val
 		}
-		Context.paramData = param
+		context.paramData = param
 
 		//反射调用
 		reflectType := reflect.TypeOf(controller)
@@ -132,13 +132,13 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 			actionMap[strings.ToLower(n)] = n
 		}
 
-		ActionName := actionMap[strings.ToLower(Context.ActionName)]
+		ActionName := actionMap[strings.ToLower(context.ActionName)]
 		ControllerName := reflectType.Elem().Name()
 		ControllerName = ControllerName[:len(ControllerName)-10]
 
-		Context.ControllerName = ControllerName
-		Context.ActionName = ActionName
-		controller.Init(Context)
+		context.ControllerName = ControllerName
+		context.ActionName = ActionName
+		controller.Init(context)
 
 		method := value.MethodByName(ActionName)
 

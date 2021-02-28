@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 	"wycto/weigo"
+	"wycto/weigo/datatype"
 )
 
 type APIController struct {
@@ -14,10 +15,9 @@ type APIController struct {
 }
 
 func (c *APIController) Index() {
-	var ww map[string]interface{}
-	ww = make(map[string]interface{})
+	ww := datatype.Row{}
 
-	rows, err := weigo.DB.Name("user").SetFields("email,`name`,`nickname`").Where(ww).Select()
+	rows, err := weigo.DB.Name("user").Fields("username,email,`name`,`nickname`").Where(&ww).Select()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -41,11 +41,11 @@ func (c *APIController) DeleteAll() {
 }
 
 func (c *APIController) Delete() {
-	var ww map[string]interface{}
-	ww = make(map[string]interface{})
+
+	ww := datatype.Row{}
 	ww["nickname"] = "update后的唯一"
 
-	rows, errorStr := weigo.DB.Name("user").Where(ww).Delete()
+	rows, errorStr := weigo.DB.Name("user").Where(&ww).Delete()
 	if errorStr != "" {
 		fmt.Println(errorStr)
 	}
@@ -54,15 +54,13 @@ func (c *APIController) Delete() {
 }
 
 func (c *APIController) Update() {
-	var ww map[string]interface{}
-	ww = make(map[string]interface{})
+	var ww = datatype.Row{}
 	ww["nickname"] = "唯一"
 
-	var dd map[string]interface{}
-	dd = make(map[string]interface{})
+	var dd datatype.Row
 	dd["nickname"] = "update后的唯一"
 
-	rows, errorStr := weigo.DB.Name("user").Where(ww).Update(dd)
+	rows, errorStr := weigo.DB.Name("user").Where(&ww).Update(dd)
 	if errorStr != "" {
 		fmt.Println(errorStr)
 	}
@@ -71,16 +69,15 @@ func (c *APIController) Update() {
 }
 
 func (c *APIController) Add() {
-	var ww map[string]interface{}
-	ww = make(map[string]interface{})
+	var ww datatype.Row
 	ww["uid"] = 3
 
-	var dd map[string]interface{}
+	var dd datatype.Row
 	dd = make(map[string]interface{})
 	dd["nickname"] = "唯一"
 
-	rows, errorStr := weigo.DB.Name("user").Insert(dd)
-	if errorStr != "" {
+	rows, errorStr := weigo.DB.Name("user").Insert(&dd)
+	if errorStr != nil {
 		fmt.Println(errorStr)
 	}
 	json, _ := json.Marshal(rows)
@@ -88,15 +85,13 @@ func (c *APIController) Add() {
 }
 
 func (c *APIController) UpdateAll() {
-	var ww map[string]interface{}
-	ww = make(map[string]interface{})
+	var ww datatype.Row
 	ww["uid"] = 3
 
-	var dd map[string]interface{}
-	dd = make(map[string]interface{})
+	var dd = datatype.Row{}
 	dd["nickname"] = "唯一333"
 
-	rows, errorStr := weigo.DB.Name("user").Where(ww).UpdateAll(dd)
+	rows, errorStr := weigo.DB.Name("user").Where(&ww).UpdateAll(dd)
 	if errorStr != "" {
 		fmt.Println(errorStr)
 	}

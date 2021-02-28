@@ -36,6 +36,46 @@ func (context *Context) IsPost() bool {
 	return false
 }
 
+//参数存在返回true
+func (context *Context) Has(keys ...string) bool {
+
+	for _, key := range keys {
+		_, ok := context.paramData[key]
+		if !ok {
+			return false
+		}
+	}
+
+	return true
+}
+
+//参数存在且不为空返回true
+func (context *Context) HasAndNotEmpty(keys ...string) bool {
+
+	for _, key := range keys {
+		v, ok := context.paramData[key]
+		if !ok {
+			return false
+		} else if v == "" || v == "false" || v == "null" || v == "0" {
+			return false
+		}
+	}
+
+	return true
+}
+
+//参数不存在返回true
+func (context *Context) NotHas(keys ...string) bool {
+	b := context.Has(keys...)
+	return !b
+}
+
+//不存在或者为空返回true
+func (context *Context) NotHasOrEmpty(keys ...string) bool {
+	b := context.HasAndNotEmpty(keys...)
+	return !b
+}
+
 //响应字符串
 func (context *Context) ResponseString(str string) {
 	context.ResponseWriter.Write([]byte(str))
