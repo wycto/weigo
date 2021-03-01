@@ -5,6 +5,7 @@ package weigo
 */
 import (
 	"encoding/json"
+	"github.com/wycto/weigo/datatype"
 	"net/http"
 )
 
@@ -14,9 +15,9 @@ type Context struct {
 	AppName        string              //当前应用名称
 	ControllerName string              //当前控制器名称
 	ActionName     string              //当前动作方法名称
-	paramData      map[string]string   //请求参数，合并类get、post
-	getData        map[string]string   //get参数
-	postData       map[string]string   //post参数
+	Param          *datatype.Row       //请求参数，合并类get、post
+	Get            *datatype.Row       //get参数
+	Post           *datatype.Row       //post参数
 	Header         map[string][]string //header信息
 }
 
@@ -40,7 +41,7 @@ func (context *Context) IsPost() bool {
 func (context *Context) Has(keys ...string) bool {
 
 	for _, key := range keys {
-		_, ok := context.paramData[key]
+		_, ok := (*context.Param)[key]
 		if !ok {
 			return false
 		}
@@ -53,7 +54,7 @@ func (context *Context) Has(keys ...string) bool {
 func (context *Context) HasAndNotEmpty(keys ...string) bool {
 
 	for _, key := range keys {
-		v, ok := context.paramData[key]
+		v, ok := (*context.Param)[key]
 		if !ok {
 			return false
 		} else if v == "" || v == "false" || v == "null" || v == "0" {
@@ -115,46 +116,4 @@ func (context *Context) ResponseSuccess(msg string, data interface{}) {
 //响应系统级信息
 func (context *Context) ResponseMessage(message *Message, data interface{}) {
 	context.ResponseApiJson(message.Code, message.Msg, data)
-}
-
-//获取get参数
-func (context *Context) Get(key string) string {
-	val, err := context.getData[key]
-	if err == false {
-		return ""
-	}
-	return val
-}
-
-//获取post参数
-func (context *Context) Post(key string) string {
-	val, err := context.postData[key]
-	if err == false {
-		return ""
-	}
-	return val
-}
-
-//获取参数
-func (context *Context) Param(key string) string {
-	val, err := context.paramData[key]
-	if err == false {
-		return ""
-	}
-	return val
-}
-
-//所有get数据-数组
-func (context *Context) GetData() map[string]string {
-	return context.getData
-}
-
-//所有post 数据-数组
-func (context *Context) PostData() map[string]string {
-	return context.postData
-}
-
-//获取所有数据-数组
-func (context *Context) ParamData() map[string]string {
-	return context.paramData
 }

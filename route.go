@@ -5,6 +5,7 @@ package weigo
 */
 import (
 	"encoding/json"
+	"github.com/wycto/weigo/datatype"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -34,7 +35,7 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 			return r == '/'
 		})
 
-		get := make(map[string]string)
+		get := datatype.Row{}
 
 		length := len(urlPathArr)
 		if length >= 3 {
@@ -42,26 +43,15 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 			context.ControllerName = urlPathArr[1]
 			context.ActionName = urlPathArr[2]
 
-			if length > 2 {
+			if length > 3 {
 				//get参数处理
-				for i := 2; i <= length; i = i + 2 {
+				for i := 3; i <= length; i = i + 2 {
 					if i+1 < length {
 						get[urlPathArr[i]] = urlPathArr[i+1]
 					} else if i < length {
 						get[urlPathArr[i]] = ""
 					}
 				}
-
-				//?后面的参数
-				rawQueryMap, err := url.ParseQuery(r.URL.RawQuery)
-
-				if err == nil {
-					for i, v := range rawQueryMap {
-						get[i] = v[len(v)-1]
-					}
-				}
-
-				context.getData = get
 			}
 		} else if length == 2 {
 			context.AppName = urlPathArr[0]
@@ -76,6 +66,17 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 			context.ControllerName = Config.App.DefaultControllerName
 			context.ActionName = Config.App.DefaultActionName
 		}
+
+		//?后面的参数
+		rawQueryMap, err := url.ParseQuery(r.URL.RawQuery)
+
+		if err == nil {
+			for i, v := range rawQueryMap {
+				get[i] = v[len(v)-1]
+			}
+		}
+
+		context.Get = &get
 
 		//post参数处理
 		jsonStr := ""
@@ -95,7 +96,8 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 			}
 		}
 
-		post := make(map[string]string)
+		//post数据
+		post := datatype.Row{}
 
 		form := r.PostForm
 		for i, v := range form {
@@ -109,17 +111,17 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 			post[k] = val
 		}
 
-		context.postData = post
+		context.Post = &post
 
 		//合并参数，post覆盖get
-		param := make(map[string]string)
-		for k, val := range context.getData {
+		param := datatype.Row{}
+		for k, val := range *context.Get {
 			param[k] = val
 		}
-		for k, val := range context.postData {
+		for k, val := range *context.Post {
 			param[k] = val
 		}
-		context.paramData = param
+		context.Param = &param
 
 		//反射调用
 		reflectType := reflect.TypeOf(controller)
