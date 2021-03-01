@@ -8,11 +8,11 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/wycto/weigo/datatype"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
-	"wycto/weigo/datatype"
 )
 
 type dataBase struct {

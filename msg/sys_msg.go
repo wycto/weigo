@@ -1,6 +1,6 @@
 package msg
 
-import "wycto/weigo"
+import "github.com/wycto/weigo"
 
 var (
 	//参数校验
