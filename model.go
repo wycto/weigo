@@ -1,6 +1,6 @@
 package weigo
 
-import "wycto/weigo/datatype"
+import "github.com/wycto/weigo/datatype"
 
 /*MVC的M层，模型类*/
 type Model struct {

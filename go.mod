@@ -1,4 +1,4 @@
-module wycto
+module github.com/wycto/weigo
 
 go 1.15
 
