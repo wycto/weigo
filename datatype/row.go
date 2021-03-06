@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"reflect"
 	"strconv"
 )
 
@@ -15,6 +16,10 @@ func (row *Row) Set(key string, val interface{}) {
 
 func (row *Row) Get(key string) interface{} {
 	return (*row)[key]
+}
+
+func (row *Row) GetType(key string) interface{} {
+	return reflect.TypeOf((*row)[key]).String()
 }
 
 func (row *Row) Has(key string) bool {
