@@ -10,10 +10,20 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"reflect"
 	"strings"
 )
 
+//静态资源路由
+func RouterStatic(url string, path string) {
+	if path == "" {
+		path = url
+	}
+	http.Handle(url, http.StripPrefix(url, http.FileServer(http.Dir(filepath.Join(RootPath, path)))))
+}
+
+//MVC控制器路由
 func Router(urlPath string, c ControllerInterface) {
 	http.HandleFunc(urlPath, AppHandleFunc(c))
 }
