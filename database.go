@@ -322,6 +322,8 @@ func (database *dataBase) getErrorString(ErrorStr string) string {
 			return "数据库连接失败，请检查连接账号密码：" + ErrorStr
 		} else if ErrorStr[:10] == "Error 1049" {
 			return "数据库不存在：" + ErrorStr
+		} else if ErrorStr[:10] == "Error 1146" {
+			return "数据表不存在：" + ErrorStr
 		} else if ErrorStr[:8] == "dial tcp" {
 			return "数据库连接失败，请检查网络：" + ErrorStr
 		}
