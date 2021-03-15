@@ -90,13 +90,13 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 
 		//post参数处理
 		jsonStr := ""
-		ct := r.Header.Values("Content-Type")
+		ct := r.Header.Get("Content-Type")
 		if len(ct) > 0 {
-			if strings.Contains(ct[0], "multipart/form-data;") {
+			if strings.Contains(ct, "multipart/form-data;") {
 				r.ParseMultipartForm(32 << 20)
-			} else if ct[0] == "application/x-www-form-urlencoded" {
+			} else if strings.Contains(ct, "application/x-www-form-urlencoded") {
 				r.ParseForm()
-			} else if ct[0] == "application/json" {
+			} else if strings.Contains(ct, "application/json") {
 
 				con, err := ioutil.ReadAll(r.Body) //获取post的数据
 				if err == nil {
