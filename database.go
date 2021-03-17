@@ -129,7 +129,7 @@ func (database *dataBase) Find() (row *datatype.Row, err error) {
 
 	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + " LIMIT 1"
 	rows, err := database.db.Query(SQL)
-	if Config.Log.SqlInfo == "console" {
+	if Config.Sql.Console == true {
 		fmt.Println(Log.FormatLogString(SQL, "Info", "SQL"))
 	}
 	database.resetSQL()
@@ -180,7 +180,7 @@ func (database *dataBase) Select() (rows *datatype.Rows, err error) {
 		fmt.Println("SQL:", SQL)
 		return rows, errors.New(database.getErrorString(err.Error()))
 	} else {
-		if Config.Log.SqlInfo == "console" {
+		if Config.Sql.Console == true {
 			fmt.Println(Log.FormatLogString(SQL, "Info", "SQL"))
 		}
 	}
@@ -225,7 +225,10 @@ func (database *dataBase) Insert(data *datatype.Row) (id string, err error) {
 		return id, errors.New("没有要插入的数据")
 	}
 
-	SQL := "INSERT INTO " + database.tableName + insertData
+	SQL := "INSERT INTO " + database.tableName + " " + insertData
+	if Config.Sql.Console == true {
+		fmt.Println(Log.FormatLogString(SQL, "Info", "SQL"))
+	}
 	database.resetSQL()
 	result, err := database.db.Exec(SQL)
 	if err != nil {
