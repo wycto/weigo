@@ -15,6 +15,7 @@ type config struct {
 	DB         dbConfig  //数据库配置
 	App        appConfig //系统应用配置
 	Log        logConfig //日志配置
+	Sql        sqlConfig
 	View       viewConfig
 }
 
@@ -42,6 +43,12 @@ type appConfig struct {
 //日志配置
 type logConfig struct {
 	SqlInfo string
+}
+
+//sql语句记录
+type sqlConfig struct {
+	Console bool
+	File    bool
 }
 
 //日志配置
