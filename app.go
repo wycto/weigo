@@ -25,14 +25,14 @@ type App struct {
 
 //初始化方法
 func init() {
-	configInit()   //初始化配置
-	dataBaseInit() //初始化数据库
+	//configInit()   //初始化配置
+	//dataBaseInit() //初始化数据库
 }
 
 //初始化配置
-func configInit() {
+func ConfigInit(configDir string) {
 	if Config.initStatus == false {
-		Config.loadConfig() //加载配置
+		Config.loadConfig(configDir) //加载配置
 	}
 }
 
