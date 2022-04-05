@@ -57,9 +57,9 @@ type viewConfig struct {
 }
 
 //加载配置
-func (receiver *config) loadConfig() {
+func (receiver *config) loadConfig(configDir string) {
 
-	filePtr, err := os.Open(RootPath + "/config/config.json")
+	filePtr, err := os.Open(RootPath + DS + configDir + "config.json")
 	if err != nil {
 		fmt.Println("Open file "+RootPath+"/config/config.json failed [Err:%s]", err.Error())
 	}
