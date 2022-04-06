@@ -35,6 +35,7 @@ type dbConfig struct {
 type appConfig struct {
 	ServerPort            string
 	Debug                 bool
+	MultiApp              bool
 	DefaultAppName        string
 	DefaultControllerName string
 	DefaultActionName     string
@@ -51,7 +52,7 @@ type sqlConfig struct {
 	File    bool
 }
 
-//日志配置
+//视图配置
 type viewConfig struct {
 	RootPath string
 }

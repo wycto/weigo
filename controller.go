@@ -56,8 +56,13 @@ func (controller *Controller) Assign(Key string, Value interface{}) {
 //页面模版渲染
 func (controller *Controller) Display(viewName string) {
 	if viewName == "" {
-		viewName = RootPath + DS + "view" + DS + strings.ToLower(controller.Context.AppName) + DS + strings.ToLower(controller.Context.ControllerName) + DS + strings.ToLower(controller.Context.ActionName) + ".html"
+		if Config.App.MultiApp == true {
+			viewName = RootPath + DS + Config.View.RootPath + DS + strings.ToLower(controller.Context.AppName) + DS + strings.ToLower(controller.Context.ControllerName) + DS + strings.ToLower(controller.Context.ActionName) + ".html"
+		} else {
+			viewName = RootPath + DS + Config.View.RootPath + DS + strings.ToLower(controller.Context.ControllerName) + DS + strings.ToLower(controller.Context.ActionName) + ".html"
+		}
 	}
+
 	t, err := template.ParseFiles(viewName)
 	if err != nil {
 		io.WriteString(controller.Context.ResponseWriter, err.Error())
