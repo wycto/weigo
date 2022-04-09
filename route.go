@@ -23,12 +23,12 @@ func RouterStatic(url string, path string) {
 	http.Handle(url, http.StripPrefix(url, http.FileServer(http.Dir(filepath.Join(RootPath, path)))))
 }
 
-//MVC控制器路由
-func Router(urlPath string, c ControllerInterface) {
-	http.HandleFunc(urlPath, AppHandleFunc(c))
+// Router MVC控制器路由
+func Router(routerPath string, appName string, c ControllerInterface) {
+	http.HandleFunc(routerPath, AppHandleFunc(routerPath, appName, c))
 }
 
-func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r *http.Request) {
+func AppHandleFunc(routerPath string, appName string, controller ControllerInterface) func(w http.ResponseWriter, r *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -41,40 +41,36 @@ func AppHandleFunc(controller ControllerInterface) func(w http.ResponseWriter, r
 			return
 		}
 
-		urlPathArr := strings.FieldsFunc(urlPath, func(r rune) bool {
+		mvcPath := strings.Replace(urlPath, routerPath, "", 1)
+		routerPathArr := strings.FieldsFunc(mvcPath, func(r rune) bool {
 			return r == '/'
 		})
 
+		length := len(routerPathArr)
+
+		context.AppName = Config.App.DefaultAppName
+		context.ControllerName = Config.App.DefaultControllerName
+		context.ActionName = Config.App.DefaultActionName
+
+		if appName != "" {
+			context.AppName = appName
+		}
+
+		if length > 0 {
+			context.ActionName = routerPathArr[0]
+		}
+
 		get := datatype.Row{}
 
-		length := len(urlPathArr)
-		if length >= 3 {
-			context.AppName = urlPathArr[0]
-			context.ControllerName = urlPathArr[1]
-			context.ActionName = urlPathArr[2]
-
-			if length > 3 {
-				//get参数处理
-				for i := 3; i <= length; i = i + 2 {
-					if i+1 < length {
-						get[urlPathArr[i]] = urlPathArr[i+1]
-					} else if i < length {
-						get[urlPathArr[i]] = ""
-					}
+		if length > 1 {
+			//get参数处理
+			for i := 1; i <= length; i = i + 2 {
+				if i+1 < length {
+					get[routerPathArr[i]] = routerPathArr[i+1]
+				} else if i < length {
+					get[routerPathArr[i]] = ""
 				}
 			}
-		} else if length == 2 {
-			context.AppName = urlPathArr[0]
-			context.ControllerName = urlPathArr[1]
-			context.ActionName = Config.App.DefaultActionName
-		} else if length == 1 {
-			context.AppName = urlPathArr[0]
-			context.ControllerName = Config.App.DefaultControllerName
-			context.ActionName = Config.App.DefaultActionName
-		} else {
-			context.AppName = Config.App.DefaultAppName
-			context.ControllerName = Config.App.DefaultControllerName
-			context.ActionName = Config.App.DefaultActionName
 		}
 
 		//?后面的参数
