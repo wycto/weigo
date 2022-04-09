@@ -48,13 +48,9 @@ func AppHandleFunc(routerPath string, appName string, controller ControllerInter
 
 		length := len(routerPathArr)
 
-		context.AppName = Config.App.DefaultAppName
+		context.AppName = appName
 		context.ControllerName = Config.App.DefaultControllerName
 		context.ActionName = Config.App.DefaultActionName
-
-		if appName != "" {
-			context.AppName = appName
-		}
 
 		if length > 0 {
 			context.ActionName = routerPathArr[0]
