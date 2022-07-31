@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 )
 
 //配置
@@ -60,9 +61,10 @@ type viewConfig struct {
 //加载配置
 func (receiver *config) loadConfig(configDir string) {
 
-	filePtr, err := os.Open(RootPath + DS + configDir + "config.json")
+	filePtr, err := os.Open(RootPath + DS + strings.Trim(configDir,DS) + DS + "config.json")
 	if err != nil {
-		fmt.Println("Open file "+RootPath+"/config/config.json failed [Err:%s]", err.Error())
+		fmt.Println("配置文件打开失败", err.Error())
+		return ;
 	}
 	defer filePtr.Close()
 
