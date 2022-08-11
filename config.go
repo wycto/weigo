@@ -34,12 +34,13 @@ type dbConfig struct {
 
 //系统应用配置
 type appConfig struct {
-	ServerPort            string
 	Debug                 bool
+	ServerPort            string
 	MultiApp              bool
 	DefaultAppName        string
 	DefaultControllerName string
 	DefaultActionName     string
+	UserDB				  bool
 }
 
 //日志配置
@@ -61,7 +62,11 @@ type viewConfig struct {
 //加载配置
 func (receiver *config) loadConfig(configDir string) {
 
-	filePtr, err := os.Open(RootPath + DS + strings.Trim(configDir,DS) + DS + "config.json")
+	if(configDir!=""){
+		configDir = strings.Trim(configDir,DS) + DS
+	}
+
+	filePtr, err := os.Open(RootPath + DS + configDir + "config.json")
 	if err != nil {
 		fmt.Println("配置文件打开失败", err.Error())
 		return ;

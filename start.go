@@ -14,6 +14,9 @@ import (
 */
 func Run() {
 
+	//初始化配置
+	ConfigInit("")
+
 	//启动服务
 	ip := GetIP()
 	fmt.Println("服务已启动，地址：", ip+":"+Config.App.ServerPort+" OR 127.0.0.1:"+Config.App.ServerPort)
