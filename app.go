@@ -33,12 +33,13 @@ func init() {
 func ConfigInit(configDir string) {
 	if Config.initStatus == false {
 		Config.loadConfig(configDir) //加载配置
+		dataBaseInit()//加载数据库
 	}
 }
 
 //初始化数据库
 func dataBaseInit() {
-	if DB.initStatus == false {
+	if Config.App.UserDB==true && DB.initStatus == false {
 		DB.getConnect() //连接数据库
 	}
 }

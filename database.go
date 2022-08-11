@@ -125,18 +125,24 @@ func (database *dataBase) Page(page int, count int) *dataBase {
 //查询一条数据
 func (database *dataBase) Find() (row *datatype.Row, err error) {
 
+	if database.initStatus!=true{
+		return row, errors.New("数据库未初始化")
+	}
+
 	row = &datatype.Row{}
 
 	SQL := "SELECT " + database.fields + " FROM " + database.tableName + database.where + database.group + database.having + database.order + " LIMIT 1"
 	rows, err := database.db.Query(SQL)
+
+	if err != nil {
+		return row, errors.New(database.getErrorString(err.Error()))
+	}
+
 	if Config.Sql.Console == true {
 		fmt.Println(Log.FormatLogString(SQL, "Info", "SQL"))
 	}
 	database.resetSQL()
 
-	if err != nil {
-		return row, errors.New(database.getErrorString(err.Error()))
-	}
 	defer rows.Close()
 
 	columns, errColumns := rows.Columns()
