@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-//配置
+// 配置
 type config struct {
 	initStatus bool      //是否已经初始化
 	DB         dbConfig  //数据库配置
@@ -20,7 +20,7 @@ type config struct {
 	View       viewConfig
 }
 
-//数据库配置
+// 数据库配置
 type dbConfig struct {
 	Type     string //数据库类型
 	HostName string //数据库连接地址
@@ -32,7 +32,7 @@ type dbConfig struct {
 	Prefix   string //表前缀
 }
 
-//系统应用配置
+// 系统应用配置
 type appConfig struct {
 	Debug                 bool
 	ServerPort            string
@@ -40,36 +40,36 @@ type appConfig struct {
 	DefaultAppName        string
 	DefaultControllerName string
 	DefaultActionName     string
-	UserDB				  bool
+	UserDB                bool
 }
 
-//日志配置
+// 日志配置
 type logConfig struct {
 	SqlInfo string
 }
 
-//sql语句记录
+// sql语句记录
 type sqlConfig struct {
 	Console bool
 	File    bool
 }
 
-//视图配置
+// 视图配置
 type viewConfig struct {
 	RootPath string
 }
 
-//加载配置
+// 加载配置
 func (receiver *config) loadConfig(configDir string) {
 
-	if(configDir!=""){
-		configDir = strings.Trim(configDir,DS) + DS
+	if configDir != "" {
+		configDir = strings.Trim(configDir, DS) + DS
 	}
 
 	filePtr, err := os.Open(RootPath + DS + configDir + "config.json")
 	if err != nil {
-		fmt.Println("配置文件打开失败", err.Error())
-		return ;
+		fmt.Println("配置文件【"+RootPath+DS+configDir+"config.json】打开失败", err.Error())
+		return
 	}
 	defer filePtr.Close()
 
