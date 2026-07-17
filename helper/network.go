@@ -1,51 +1,43 @@
-package weigo
+package helper
 
-/*
-函数都写在这儿
-*/
 import (
 	"errors"
-	"fmt"
 	"net"
 	"os"
 )
 
-/**
-获取IP地址
-*/
+// GetIP 获取本机 IP
 func GetIP() string {
 	ip, err := externalIP()
 	if err != nil {
-		return GetIP2()
-		fmt.Println(err)
+		return getLocalIP()
 	}
-
 	return ip.String()
 }
 
-func GetIP2() string {
+// getLocalIP 获取本地 IP
+func getLocalIP() string {
 	var ip = ""
 	address, err := net.InterfaceAddrs()
-
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return "127.0.0.1"
 	}
 
 	for _, address := range address {
-
-		// 检查ip地址判断是否回环地址
 		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
 				ip = ipnet.IP.String()
 			}
-
 		}
 	}
 
+	if ip == "" {
+		return "127.0.0.1"
+	}
 	return ip
 }
 
+// externalIP 获取外网 IP
 func externalIP() (net.IP, error) {
 	ifaces, err := net.Interfaces()
 	if err != nil {
@@ -53,17 +45,17 @@ func externalIP() (net.IP, error) {
 	}
 	for _, iface := range ifaces {
 		if iface.Flags&net.FlagUp == 0 {
-			continue // interface down
+			continue
 		}
 		if iface.Flags&net.FlagLoopback != 0 {
-			continue // loopback interface
+			continue
 		}
 		addrs, err := iface.Addrs()
 		if err != nil {
 			return nil, err
 		}
 		for _, addr := range addrs {
-			ip := getIpFromAddr(addr)
+			ip := getIPFromAddr(addr)
 			if ip == nil {
 				continue
 			}
@@ -73,7 +65,8 @@ func externalIP() (net.IP, error) {
 	return nil, errors.New("connected to the network?")
 }
 
-func getIpFromAddr(addr net.Addr) net.IP {
+// getIPFromAddr 从地址获取 IP
+func getIPFromAddr(addr net.Addr) net.IP {
 	var ip net.IP
 	switch v := addr.(type) {
 	case *net.IPNet:
@@ -86,8 +79,16 @@ func getIpFromAddr(addr net.Addr) net.IP {
 	}
 	ip = ip.To4()
 	if ip == nil {
-		return nil // not an ipv4 address
+		return nil
 	}
-
 	return ip
+}
+
+// GetHostname 获取主机名
+func GetHostname() string {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return "unknown"
+	}
+	return hostname
 }
