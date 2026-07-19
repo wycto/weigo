@@ -28,8 +28,14 @@ func Connect(cfg DBConfig) (*DB, error) {
 			cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.Database, cfg.Charset)
 		dialector = mysql.Open(dsn)
 	case "postgres":
-		dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-			cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.Database)
+		var dsn string
+		if cfg.Password != "" {
+			dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+				cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.Database)
+		} else {
+			dsn = fmt.Sprintf("postgres://%s@%s:%s/%s?sslmode=disable",
+				cfg.Username, cfg.Host, cfg.Port, cfg.Database)
+		}
 		dialector = postgres.Open(dsn)
 	default:
 		return nil, fmt.Errorf("unsupported database driver: %s", cfg.Driver)
