@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -16,22 +17,34 @@ type DB struct {
 
 // Connect 连接数据库
 func Connect(cfg DBConfig) (*DB, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
-		cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.Database, cfg.Charset)
+	var dialector gorm.Dialector
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	switch cfg.Driver {
+	case "sqlite":
+		dialector = sqlite.Open(cfg.Database)
+	case "mysql":
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
+			cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.Database, cfg.Charset)
+		dialector = mysql.Open(dsn)
+	default:
+		return nil, fmt.Errorf("unsupported database driver: %s", cfg.Driver)
+	}
+
+	db, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
 
-	// 配置连接池
-	sqlDB, err := db.DB()
-	if err != nil {
-		return nil, err
+	// 配置连接池 (SQLite不需要连接池配置)
+	if cfg.Driver != "sqlite" {
+		sqlDB, err := db.DB()
+		if err != nil {
+			return nil, err
+		}
+		sqlDB.SetMaxIdleConns(10)
+		sqlDB.SetMaxOpenConns(100)
+		sqlDB.SetConnMaxLifetime(time.Hour)
 	}
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	fmt.Println("数据库连接成功")
 	return &DB{DB: db, Prefix: cfg.Prefix}, nil

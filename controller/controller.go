@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"html/template"
 	"os"
 	"path/filepath"
@@ -16,12 +17,19 @@ import (
 type Controller struct {
 	C    echo.Context
 	data map[string]interface{}
+	body map[string]interface{}
 }
 
 // Init 初始化控制器
 func (c *Controller) Init(ctx echo.Context) {
 	c.C = ctx
 	c.data = make(map[string]interface{})
+	c.body = make(map[string]interface{})
+
+	// 解析JSON body
+	if ctx.Request().Body != nil {
+		json.NewDecoder(ctx.Request().Body).Decode(&c.body)
+	}
 }
 
 // GetAppName 获取应用名
@@ -124,7 +132,7 @@ type Message struct {
 	Msg  string
 }
 
-// Router 自动路由（反射调用控制器方法）
+// Router 自动路由（反射调用控制器方法，支持 GET 和 POST）
 func Router(e *echo.Echo, path string, appName string, controller interface{}) {
 	// 存储控制器类型信息用于反射
 	typeInfo := reflect.TypeOf(controller)
@@ -141,7 +149,8 @@ func Router(e *echo.Echo, path string, appName string, controller interface{}) {
 		actionMap[strings.ToLower(name)] = name
 	}
 
-	e.GET(path+"*", func(ctx echo.Context) error {
+	// 通用处理函数
+	handler := func(ctx echo.Context) error {
 		// 创建新的控制器实例（避免并发问题）
 		newController := reflect.New(typeInfo.Elem()).Interface()
 
@@ -165,6 +174,9 @@ func Router(e *echo.Echo, path string, appName string, controller interface{}) {
 		if len(parts) > 0 && parts[0] != "" {
 			actionName = parts[0]
 		}
+
+		// 移除连字符，支持 add-member -> addmember -> AddMember
+		actionName = strings.ReplaceAll(actionName, "-", "")
 
 		// 处理 URL 参数（/key/value/key/value 格式）
 		for i := 1; i < len(parts); i += 2 {
@@ -190,7 +202,13 @@ func Router(e *echo.Echo, path string, appName string, controller interface{}) {
 		}
 
 		return ctx.String(404, "404 page not found: "+urlPath)
-	})
+	}
+
+	// 注册 GET 和 POST 路由
+	e.GET(path+"*", handler)
+	e.POST(path+"*", handler)
+	e.PUT(path+"*", handler)
+	e.DELETE(path+"*", handler)
 }
 
 // RouterStatic 静态资源路由
@@ -208,6 +226,19 @@ func (c *Controller) GetInt(key string, defaultVal int) int {
 		v = c.C.QueryParam(key)
 	}
 	if v == "" {
+		// 从JSON body获取
+		if val, ok := c.body[key]; ok {
+			switch v := val.(type) {
+			case float64:
+				return int(v)
+			case int:
+				return v
+			case string:
+				if i, err := strconv.Atoi(v); err == nil {
+					return i
+				}
+			}
+		}
 		return defaultVal
 	}
 	i, err := strconv.Atoi(v)
@@ -224,7 +255,18 @@ func (c *Controller) GetString(key string, defaultVal string) string {
 		v = c.C.QueryParam(key)
 	}
 	if v == "" {
+		// 从JSON body获取
+		if val, ok := c.body[key]; ok {
+			if str, ok := val.(string); ok {
+				return str
+			}
+		}
 		return defaultVal
 	}
 	return v
+}
+
+// GetBody 获取解析后的JSON body
+func (c *Controller) GetBody() map[string]interface{} {
+	return c.body
 }
