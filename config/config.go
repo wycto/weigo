@@ -17,19 +17,19 @@ var DS = string(os.PathSeparator)
 type Config struct {
 	App  AppConfig  `json:"App"`
 	DB   DBConfig   `json:"DB"`
-	Log  LogConfig  `json:"Log"`
 	View ViewConfig `json:"View"`
 }
 
 // AppConfig 应用配置
 type AppConfig struct {
-	Debug                 bool   `json:"Debug"`
-	Port                  string `json:"Port"`
-	MultiApp              bool   `json:"MultiApp"`
-	DefaultAppName        string `json:"DefaultAppName"`
-	DefaultControllerName string `json:"DefaultControllerName"`
-	DefaultActionName     string `json:"DefaultActionName"`
-	UseDB                 bool   `json:"UseDB"`
+	Debug                 bool     `json:"Debug"`
+	Port                  string   `json:"Port"`
+	DefaultAppName        string   `json:"DefaultAppName"`
+	DefaultControllerName string   `json:"DefaultControllerName"`
+	DefaultActionName     string   `json:"DefaultActionName"`
+	UseDB                 bool     `json:"UseDB"`
+	AllowOrigins          []string `json:"AllowOrigins"` // CORS 允许的来源域名
+	AllowHeaders          []string `json:"AllowHeaders"` // CORS 允许的请求头
 }
 
 // DBConfig 数据库配置
@@ -47,13 +47,6 @@ type DBConfig struct {
 // ViewConfig 视图配置
 type ViewConfig struct {
 	RootPath string `json:"RootPath"`
-}
-
-// LogConfig 日志配置
-type LogConfig struct {
-	Console bool   `json:"Console"`
-	File    bool   `json:"File"`
-	Level   string `json:"Level"` // debug, info, warn, error
 }
 
 // GlobalConfig 全局配置实例

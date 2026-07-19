@@ -87,7 +87,7 @@ func (c *ChainQuery) FindOne(result interface{}) error {
 
 // Insert 新增
 func (c *ChainQuery) Insert(data interface{}) error {
-	return c.db.Table(c.table).Create(data).Error
+	return c.db.TableName(c.table).Create(data).Error
 }
 
 // Update 更新
@@ -110,18 +110,20 @@ func (c *ChainQuery) Count(result *int64) error {
 
 // buildQuery 构建查询
 func (c *ChainQuery) buildQuery() *gorm.DB {
-	query := c.db.Table(c.table)
+	query := c.db.TableName(c.table)
 
 	if c.fields != "" {
 		query = query.Select(c.fields)
 	}
 
-	for i, w := range c.where {
-		if i == 0 {
-			query = query.Where(w, c.args...)
-		} else {
-			query = query.Where(w, c.args[i])
-		}
+	// 正确处理每个 Where 条件的参数：用 offset 追踪 args 切片位置
+	argOffset := 0
+	for _, w := range c.where {
+		// 统计当前条件中的 ? 占位符数量
+		placeholders := countPlaceholders(w)
+		conditionArgs := c.args[argOffset : argOffset+placeholders]
+		argOffset += placeholders
+		query = query.Where(w, conditionArgs...)
 	}
 
 	if c.order != "" {
@@ -141,4 +143,15 @@ func (c *ChainQuery) buildQuery() *gorm.DB {
 	}
 
 	return query
+}
+
+// countPlaceholders 统计 SQL 条件中的 ? 占位符数量
+func countPlaceholders(s string) int {
+	count := 0
+	for i := 0; i < len(s); i++ {
+		if s[i] == '?' {
+			count++
+		}
+	}
+	return count
 }

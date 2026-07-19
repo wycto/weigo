@@ -79,7 +79,6 @@ func ConfigInit(configDir string) {
 
 // Run 启动服务
 func Run() {
-	// 初始化 Echo
 	if Echo == nil {
 		New()
 	}

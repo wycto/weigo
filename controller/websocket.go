@@ -6,13 +6,17 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
+	"github.com/wycto/weigo/helper"
 )
 
-// Upgrader WebSocket 升级器
+// Upgrader WebSocket 升级器（根据配置检查来源）
 var Upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
-		// 生产环境应配置允许的域名
-		return true
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			return false
+		}
+		return helper.IsOriginAllowed(origin)
 	},
 }
 
@@ -85,13 +89,29 @@ func (m *WebSocketManager) Run() {
 
 		case message := <-m.broadcast:
 			m.mu.RLock()
+			conns := make([]*websocket.Conn, 0, len(m.connections))
 			for conn := range m.connections {
-				if err := conn.WriteMessage(websocket.TextMessage, message); err != nil {
-					conn.Close()
-					delete(m.connections, conn)
-				}
+				conns = append(conns, conn)
 			}
 			m.mu.RUnlock()
+
+			// 先收集失败连接，再统一切除（避免 RLock 下修改 map）
+			var failed []*websocket.Conn
+			for _, conn := range conns {
+				if err := conn.WriteMessage(websocket.TextMessage, message); err != nil {
+					failed = append(failed, conn)
+				}
+			}
+			if len(failed) > 0 {
+				m.mu.Lock()
+				for _, conn := range failed {
+					if _, ok := m.connections[conn]; ok {
+						delete(m.connections, conn)
+						conn.Close()
+					}
+				}
+				m.mu.Unlock()
+			}
 		}
 	}
 }
